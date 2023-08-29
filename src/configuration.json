@@ -1,0 +1,7 @@
+{
+  "database": {
+    "type": "file",
+    "fileName": "./thor-database.db3",
+    "retention": 7
+  }
+}
