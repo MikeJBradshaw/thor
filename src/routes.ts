@@ -1,6 +1,8 @@
 import { combineRoutes, r } from '@marblejs/http'
 import { mapTo } from 'rxjs/operators'
 
+import devices$ from 'endpoints/devices'
+
 const root$ = r.pipe(
   r.matchPath('/'),
   r.matchType('GET'),
@@ -19,7 +21,8 @@ const foo$ = r.pipe(
 
 const all$ = combineRoutes('/api/v1', [
   root$,
-  foo$
+  foo$,
+  devices$
 ])
 
 export default all$

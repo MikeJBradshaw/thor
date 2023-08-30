@@ -1,3 +1,9 @@
+export interface BridgeMessageDevicesEvent {
+  ieee_address: string
+  friendly_name: string
+  description: string
+}
+
 export interface MqttSubscriptionEvent {
   topic: string
   entity: string

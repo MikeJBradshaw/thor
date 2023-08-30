@@ -20,7 +20,7 @@ export const lightOn = (
   payload: LightOnPayload
 ): LightOnAction => ({ type: LIGHT_ON, topics, payload })
 
-interface LightOffPayload { state: 'ON' | 'OFF' }
+interface LightOffPayload { state?: 'ON' | 'OFF', brightness?: number }
 export const LIGHT_OFF = 'LIGHT_OFF'
 export interface LightOffAction extends Action { payload: LightOffPayload }
 export const lightOff = (

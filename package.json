@@ -4,6 +4,7 @@
     "@marblejs/http": "^4.1.0",
     "@marblejs/middleware-body": "^4.1.0",
     "@marblejs/middleware-logger": "^4.1.0",
+    "@types/sqlite3": "^3.1.8",
     "fp-ts": "^2.16.1",
     "mqtt": "^5.0.2",
     "redux-observable": "^2.0.0",

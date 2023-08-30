@@ -7,6 +7,7 @@ import type { LightOnAction, LightOffAction } from 'data/actions'
 import type { MotionSensorEvent } from 'data/events'
 
 const RED = '#FF0000'
+const BRIGHTNESS_OFF = 0
 const BRIGHTNESS_LOW = 15
 const BRIGHTNESS_HIGH = 255
 const DAY_END = '21:00:00'
@@ -30,9 +31,9 @@ export const masterBathroomMotionDetectorEvent = (
         MASTER_BATH_LIGHTS,
         isNight(date)
           ? { brightness: BRIGHTNESS_LOW, color: { hex: `${RED}` } }
-          : { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }
+          : { brightness: BRIGHTNESS_HIGH, color_temp: 'coolest' }
       )
     }
-    return lightOff(MASTER_BATH_LIGHTS, { state: 'OFF' })
+    return lightOff(MASTER_BATH_LIGHTS, { brightness: BRIGHTNESS_OFF })
   })
 )

@@ -16,7 +16,7 @@ import { masterBathroomMotionDetectorEvent } from 'entities/master'
 import { laundryMotionDetectorEvent } from 'entities/laundry'
 
 /**************
- * ZIBGEE 
+ * ZIBGEE
  * ***********/
 const subscriptions$: any = new Observable(observer => {
   const client: MqttClient = connect('mqtt://localhost:1883')
@@ -28,13 +28,13 @@ const subscriptions$: any = new Observable(observer => {
         if (error !== null) {
           observer.error(error)
         } else {
-          client.on('message', (topic, message) => {
+          client.on('message', (topic, buffer) => {
             const [_, __, entity, device] = topic.split('/')
             observer.next({
               topic,
               entity,
               device,
-              payload: JSON.parse(message.toString())
+              payload: JSON.parse(buffer.toString())
             })
           })
         }

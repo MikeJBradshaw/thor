@@ -1,5 +1,7 @@
 import { Database } from 'sqlite3'
+import { connect } from 'mqtt'
 
+import type { BridgeMessageDevicesEvent } from 'data/events'
 import config from 'configuration.json'
 
 /**
@@ -14,28 +16,50 @@ const initDatabase = (): void => {
   console.log(`Detected database type: ${type} database location: ${type === 'file' ? fileName : 'memory'}`)
   const db = new Database(type === 'file' ? fileName : ':memory:')
 
-  console.log('DROPPING TABLES ...')
+  console.log('DROPPING TABLES...')
   db.serialize(() => {
     db.run('DROP TABLE IF EXISTS device')
-    db.run('DROP TABLE IF EXISTS soil_moisture_history')
-    db.run('DROP TABLE IF EXISTS temp_himidity_history')
+    db.run('DROP TABLE IF EXISTS event_audit')
+    db.run('DROP TABLE IF EXISTS action_audit')
   })
 
   db.serialize(() => {
+    console.log('CREATING TABLES...')
     console.log('CREATING TABLE "device"')
-    db.run('CREATE TABLE device (id INTEGER, friendly_name TEXT, entity TEXT, PRIMARY KEY(id))')
+    db.run(
+      'CREATE TABLE device (id INTEGER, friendly_name TEXT, display_name TEXT, location TEXT, type TEXT, description TEXT, ieee_address TEXT, PRIMARY KEY(id))'
+    )
 
-    // console.log('CREATING TABLE "global_setting"')
-    // db.run('CREATE TABLE global_setting')
+    console.log('CREATING TABLE "event_audit"')
+    db.run('CREATE TABLE event_audit (id INTEGER, date_time TEXT, uuid TEXT, entity, TEXT, device TEXT, payload TEXT, PRIMARY KEY(id))')
 
-    console.log('CREATING TABLE "soil_moisture_history"')
-    db.run('CREATE TABLE soil_moisture_history (id INTEGER, device_id INTEGER, date DATE_TIME, soil_moisture INTEGER, soil_temp FLOAT, PRIMARY KEY(id), FOREIGN KEY(device_id) REFERENCES device(id))')
+    console.log('CREATING TABLE "action_audit"')
+    db.run('CREATE TABLE action_audit (id INTEGER, date_time TEXT, uuid TEXT, topic TEXT, payload TEXT, PRIMARY KEY(id))')
 
-    console.log('CREATING TABLE "temp_humidity_history"')
-    db.run('CREATE TABLE temp_himidity_history (id INTEGER, device_id INTEGER, date DATE_TIME, humidity INTEGER, temp FLOAT, PRIMARY KEY(id), FOREIGN KEY(device_id) REFERENCES device(device_id))')
-
-    console.log('ALL TABLES CREATED...')
+    console.log('ALL TABLES CREATED, FINDING ANY ALREADY CONNECTED DEVICES...')
   })
+  const client = connect('mqtt://localhost:1883')
+  client.subscribe('z2m/bridge/devices', (err) => {
+    if (err !== null) {
+      console.error(err)
+    }
+
+    client.on('message', (topic, buffer) => {
+      const message: BridgeMessageDevicesEvent[] = JSON.parse(buffer.toString())
+      db.serialize(() => {
+        for (const device of message) {
+          console.log(`INSERTING DEVICE ${device.ieee_address}`)
+          db.run(
+            'INSERT INTO device(ieee_address, friendly_name, description) VALUES (?, ?, ?)',
+            [device.ieee_address, device.friendly_name, device.description],
+            (err) => console.error(err)
+          )
+        }
+      })
+    })
+    client.end()
+  })
+
   db.close()
 }
 
