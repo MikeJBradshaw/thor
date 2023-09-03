@@ -23,7 +23,7 @@ type MasterBathroomMotionDetectorEventReturnType = Observable<LightOnAction | Li
 export const masterBathroomMotionDetectorEvent = (
   event$: Observable<MotionSensorEvent>
 ): MasterBathroomMotionDetectorEventReturnType => event$.pipe(
-  ofEvent('master_bath', 'motion_sensor'),
+  ofEvent({ master_bath: ['motion_sensor'] }),
   map(({ payload: { occupancy } }) => {
     if (occupancy) {
       const date = new Date().toLocaleTimeString('en', { hour12: false })
@@ -31,7 +31,7 @@ export const masterBathroomMotionDetectorEvent = (
         MASTER_BATH_LIGHTS,
         isNight(date)
           ? { brightness: BRIGHTNESS_LOW, color: { hex: `${RED}` } }
-          : { brightness: BRIGHTNESS_HIGH, color_temp: 'coolest' }
+          : { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }
       )
     }
     return lightOff(MASTER_BATH_LIGHTS, { brightness: BRIGHTNESS_OFF })
