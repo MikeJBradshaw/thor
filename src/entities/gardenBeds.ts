@@ -13,7 +13,7 @@ type BedTwoBatteryEpicReturnType = Observable<BatteryWarningAction | BatteryCrit
 export const bedTwoBatteryEpic = (
   event$: Observable<SoilMoistureAndTemperatureEvent>
 ): BedTwoBatteryEpicReturnType => event$.pipe(
-  ofEvent('chicken_coop', 'temp_humidity'),
+  ofEvent({ chicken_coop: ['temp_humidity'] }),
   filter(({ payload: { battery } }) => battery < BATTERY_ALERT_THRESHOLD),
   map(({
     payload: { battery },
@@ -30,7 +30,7 @@ type BedSoilMoistureTemperatureReturnType = Observable<WaterOnAction | WaterOffA
 export const bedTwoSoilMoistureTemperature = (
   event$: Observable<SoilMoistureAndTemperatureEvent>
 ): BedSoilMoistureTemperatureReturnType => event$.pipe(
-  ofEvent('bed_2', 'soil_moisture'),
+  ofEvent({ bed_2: ['soil_moisture'] }),
   startWith({ payload: { soilMoisture: -1, temperature: -1 } }),
   pairwise(),
   filter(

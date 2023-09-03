@@ -14,7 +14,7 @@ const HUMIDITY_THRESHOLD = 50
 export const chickenCoopTempHumidityEpic = (
   event$: Observable<TemperatureHumidityEvent>
 ): Observable<PlugPowerAction> => event$.pipe(
-  ofEvent('chicken_coop', 'temp_humidity'),
+  ofEvent({ chicken_coop: ['temp_humidity'] }),
   startWith({ payload: { humidity: -1, temperature: -1 } }),
   pairwise(),
   filter(([{ payload: { humidity: ph, temperature: pt } }, { payload: { humidity, temperature } }]) =>

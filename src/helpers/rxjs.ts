@@ -6,11 +6,13 @@ import type { MqttSubscriptionEvent } from 'data/events'
 
 import config from 'configuration.json'
 
+interface OfEventData {
+  [key: string]: string[]
+}
 export const ofEvent = <T = MqttSubscriptionEvent>(
-  entity: string,
-  device: string
+  events: OfEventData
 ) => (source: Observable<T>): typeof source => source.pipe(
-  filter(({ device: dev, entity: ent }: any) => ent === entity && dev === device)
+  filter(({ entity, device }: any) => entity === events[entity] && events[entity].includes(device))
 )
 
 // database global client object
