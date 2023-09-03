@@ -27,6 +27,7 @@ export const masterBathroomMotionDetectorEvent = (
   map(({ payload: { occupancy } }) => {
     if (occupancy) {
       const date = new Date().toLocaleTimeString('en', { hour12: false })
+
       return lightOn(
         MASTER_BATH_LIGHTS,
         isNight(date)

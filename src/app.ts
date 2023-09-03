@@ -30,7 +30,7 @@ const bridge$: any = new Observable(observer => {
 
       client.on('message', (topic, buffer) => {
         console.log(`topic: ${topic} payload: ${buffer.toString()}`)
-        observer.next({topic, payload: JSON.parse(buffer.toString())})
+        observer.next({ topic, payload: JSON.parse(buffer.toString()) })
       })
     })
   })
@@ -46,6 +46,7 @@ const subscriptions$: any = new Observable(observer => {
   const client: MqttClient = connect('mqtt://localhost:1883')
   client.on('connect', () => {
     client.subscribe(['z2m/property/#', 'z2m/home/#'], error => {
+      console.log('monitoring subscription')
       if (error !== null) {
         observer.error(error)
       }
