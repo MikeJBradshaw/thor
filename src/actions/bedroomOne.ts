@@ -7,8 +7,8 @@ export enum ButtonState {
 }
 
 export const BEDROOM_ONE_LIGHTS = [
-  'z2m/home/lola/light/light_1/set',
-  'z2m/home/lola/light/light_2/set'
+  'z2m/home/lola/light/light_1',
+  'z2m/home/lola/light/light_2'
 ]
 
 type ButtonStandardStates = ButtonState.Default | ButtonState.Double | ButtonState.Single
