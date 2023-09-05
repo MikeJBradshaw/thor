@@ -1,7 +1,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { combineEpics, createEpicMiddleware } from 'redux-observable'
 import bedroomOneReducer from 'reducers/bedroomOne'
-import mqttPublishClientReducer from 'reducers/mqttPublshClient'
+import mqttPublishClientReducer from 'reducers/mqttClient'
 import laundryReducer from 'reducers/laundry'
 import masterReducer from 'reducers/master'
 import bedroomOneEpic from 'epics/bedroomOne'

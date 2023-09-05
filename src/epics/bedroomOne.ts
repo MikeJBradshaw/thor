@@ -2,14 +2,18 @@ import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
-import { BEDROOM_ONE_LIGHTS, BUTTON_CLICK } from 'actions/bedroomOne'
-import { lightOnPublish, noop } from 'actions/mqttPublishClient'
+import {
+  BEDROOM_ONE_LIGHTS,
+  BEDROOM_ONE_POWER_ONE,
+  BUTTON_CLICK
+} from 'actions/bedroomOne'
+import { lightOnPublish, noop, powerOn, powerOff } from 'actions/mqttClient'
 import { ButtonState } from 'payloads'
 import type { RootState } from 'store'
 import type { ButtonClickAction } from 'actions/bedroomOne'
-import type { LightOnPublish, Noop } from 'actions/mqttPublishClient'
+import type { LightOnPublish, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
 
-type ButtonClickedEpicReturnType = Observable<LightOnPublish | Noop>
+type ButtonClickedEpicReturnType = Observable<LightOnPublish | Noop | PowerOn | PowerOff>
 const buttonClickEpic = (
   action$: Observable<ButtonClickAction>,
   state$: StateObservable<RootState>
@@ -42,7 +46,8 @@ const buttonClickEpic = (
             brightness: state$.value.bedroomOneReducer.doubleClickState.values.brightness,
             ...colorPackage
           }
-        )
+        ),
+        powerOff(BEDROOM_ONE_POWER_ONE, { state: 'OFF', power_on_behavior: 'on' })
       )
     }
 
@@ -66,7 +71,8 @@ const buttonClickEpic = (
             brightness: state$.value.bedroomOneReducer.singleClickState.values.brightness,
             ...colorPackage
           }
-        )
+        ),
+        powerOn(BEDROOM_ONE_POWER_ONE, { state: 'ON' })
       )
     }
 
@@ -78,7 +84,8 @@ const buttonClickEpic = (
 
     return of(
       lightOnPublish(BEDROOM_ONE_LIGHTS[0], { brightness, ...colorPackage }),
-      lightOnPublish(BEDROOM_ONE_LIGHTS[1], { brightness, ...colorPackage })
+      lightOnPublish(BEDROOM_ONE_LIGHTS[1], { brightness, ...colorPackage }),
+      powerOff(BEDROOM_ONE_POWER_ONE, { state: 'OFF', power_on_behavior: 'on' })
     )
   })
 )

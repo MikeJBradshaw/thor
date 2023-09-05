@@ -3,10 +3,10 @@ import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import { MOTION_SENSOR, LAUNDRY_LIGHTS } from 'actions/laundry'
-import { lightOnPublish, noop } from 'actions/mqttPublishClient'
+import { lightOnPublish, noop } from 'actions/mqttClient'
 import type { RootState } from 'store'
 import type { MotionSensorAction } from 'actions/laundry'
-import type { LightOnPublish, Noop } from 'actions/mqttPublishClient'
+import type { LightOnPublish, Noop } from 'actions/mqttClient'
 
 const BRIGHTNESS_HIGH = 255
 const BRIGHTNESS_OFF = 0

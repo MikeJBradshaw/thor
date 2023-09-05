@@ -5,6 +5,8 @@ export const BEDROOM_ONE_LIGHTS = [
   'z2m/home/lola/light/light_2'
 ]
 
+export const BEDROOM_ONE_POWER_ONE = 'z2m/home/lola/power/sound_machine'
+
 type ButtonStandardStates = ButtonState.Default | ButtonState.Double | ButtonState.Single
 export const BUTTON_CLICK = 'BEDROOM_ONE_BUTTON_CLICK'
 export interface ButtonClickAction { type: typeof BUTTON_CLICK, state: ButtonStandardStates }

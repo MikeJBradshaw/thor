@@ -1,5 +1,5 @@
-import { Observable, of, timer } from 'rxjs'
-import { switchMap, map } from 'rxjs/operators'
+import { Observable, of } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
@@ -9,7 +9,7 @@ import {
   MASTER_BATH_BUTTON_RELEASE,
   MASTER_BATH_MOTION_SENSOR
 } from 'actions/master'
-import { lightOnPublish, noop } from 'actions/mqttPublishClient'
+import { lightOnPublish, noop } from 'actions/mqttClient'
 import { ButtonState } from 'payloads'
 import type { RootState } from 'store'
 import type {
@@ -18,7 +18,7 @@ import type {
   MasterBathButtonReleaseAction,
   MasterBathMotionSensorAction
 } from 'actions/master'
-import type { LightOnPublish, Noop } from 'actions/mqttPublishClient'
+import type { LightOnPublish, Noop } from 'actions/mqttClient'
 
 const BRIGHTNESS_HIGH = 255
 const BRIGHTNESS_LOW = 15

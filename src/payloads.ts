@@ -33,3 +33,22 @@ export enum ButtonState {
   Release = 'release'
 }
 
+export interface Action {
+  path: string
+  payload: any
+}
+
+interface Color {
+  hex: string
+}
+
+export interface LightPayload {
+  brightness: number
+  color?: Color
+  color_temp?: 'warmest' | 'warm' | 'neutral' | 'cool' | 'coolest'
+}
+
+export interface PowerPayload {
+  state: 'ON' | 'OFF'
+  power_on_behavior?: 'off' | 'on' | 'toggle'
+}
