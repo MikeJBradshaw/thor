@@ -1,16 +1,16 @@
-export interface Button {
-  action: 'single' | 'double' | 'hold' | 'release' | 'init'
+export interface ButtonPayload {
+  action: string
   battery: number
   linkquality: number
 }
 
-export interface MotionSensor {
+export interface MotionSensorPayload {
   occupancy: boolean
   batteryLow: boolean
   battery: number
 }
 
-export interface SoilMoistureAndTemperature {
+export interface SoilMoistureAndTemperaturePayload {
   battery: number
   batteryState: string
   linkQuality: number
@@ -18,11 +18,9 @@ export interface SoilMoistureAndTemperature {
   temperature: number
 }
 
-export interface TemperatureAndHumdity {
+export interface TemperatureAndHumdityPayload {
   battery: number
   humidity: number
   linkQuality: number
   temperature: number
 }
-
-

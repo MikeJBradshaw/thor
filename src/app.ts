@@ -7,7 +7,7 @@ import type { IO } from 'fp-ts/lib/IO'
 
 import { buttonClick, buttonHold, buttonRelease } from 'actions/bedroomOne'
 import { motionSensor } from 'actions/laundry'
-import { masterBathMotionSensor } from 'actions/master'
+import { masterBathMotionSensor, masterBathButtonHold, masterBathButtonRelease } from 'actions/master'
 import routes from 'routes'
 import store from '../src/store'
 
@@ -18,12 +18,14 @@ const TEST_ADDRESS = '10.243.31.95'
 const LOCALHOST = 'localhost'
 const LEVEL = process.env.level === 'test' ? 'test' : 'production'
 const CONNECTION_STRING = `mqtt://${LEVEL === 'test' ? TEST_ADDRESS : LOCALHOST}:1883`
-const DEBUG_STATE = process.env.debug_state === 'true' ? true : false
+const DEBUG_STATE = process.env.debug_state === 'true'
+const LOG_PUBLISH = process.env.log_publish === 'true'
 
 console.log('###########################################################')
-console.log('LEVEL:', LEVEL)
+console.log('LEVEL:            ', LEVEL)
+console.log('DEBUG_STATE:      ', DEBUG_STATE)
+console.log('LOG_PUBLISH:      ', LOG_PUBLISH)
 console.log('CONNECTION_STRING:', CONNECTION_STRING)
-console.log('DEBUG_STATE', DEBUG_STATE)
 console.log('###########################################################')
 
 const client: MqttClient = connect(CONNECTION_STRING)
@@ -37,7 +39,6 @@ client.on('connect', () => {
     }
 
     client.on('message', (topic, buffer) => {
-      console.log('subscription message - Topic:', topic, 'message:', JSON.parse(buffer.toString()))
       const [_, __, entity, device] = topic.split('/')
       const data = JSON.parse(buffer.toString())
 
@@ -75,6 +76,24 @@ client.on('connect', () => {
             case 'motion_sensor':
               store.dispatch(masterBathMotionSensor(data))
               break
+
+            case 'button':
+              switch (data.action) {
+                case 'hold':
+                  store.dispatch(masterBathButtonHold(data))
+                  break
+                case 'release':
+                  store.dispatch(masterBathButtonRelease(data))
+                  break
+                // case 'single':
+                // case 'double':
+                  // store.dispatch(buttonClick(data.action))
+                  // break
+                default:
+                  break
+              }
+              break
+
             default:
               break
           }

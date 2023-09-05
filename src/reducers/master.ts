@@ -1,13 +1,17 @@
 import type { Reducer } from 'redux'
 
-import { MASTER_BATH_MOTION_SENSOR } from 'actions/master'
+import {
+  MASTER_BATH_BUTTON_HOLD,
+  MASTER_BATH_BUTTON_RELEASE,
+  MASTER_BATH_MOTION_SENSOR
+} from 'actions/master'
 import type { MasterAction } from 'actions/master'
-import type { MotionSensor } from 'payloads'
+import type { MotionSensorPayload } from 'payloads'
 
 interface MasterState {
   overrideMasterBathLights: boolean
   overrideMasterBathMotionSensor: boolean
-  motionSensorState: MotionSensor
+  motionSensorState: MotionSensorPayload
 }
 
 const initState: MasterState = {
@@ -27,6 +31,14 @@ const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, ac
         ...state,
         motionSensorState: action.payload
       }
+    }
+
+    case MASTER_BATH_BUTTON_HOLD: {
+      return { ...state, overrideMasterBathMotionSensor: true }
+    }
+
+    case MASTER_BATH_BUTTON_RELEASE: {
+      return { ...state, overrideMasterBathMotionSensor: false }
     }
 
     default:

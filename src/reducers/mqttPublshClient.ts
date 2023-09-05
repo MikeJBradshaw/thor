@@ -10,6 +10,7 @@ interface MqttClientState {
 }
 
 const LEVEL = process.env.level
+const LOG_PUBLISH = process.env.log_publish === 'true'
 const CONNECTION_STRING = `mqtt://${LEVEL === 'test' ? '10.243.31.95:1883' : 'localhost'}:1883`
 const mqttClient = connect(CONNECTION_STRING)
 
@@ -27,6 +28,10 @@ const mqttPublishClientReducer: Reducer<MqttClientState, MqttClientAction> = (st
 
   switch (action.type) {
     case LIGHT_ON_PUBLISH:
+      if (LOG_PUBLISH) {
+        console.log('PUBLISH:', action)
+      }
+
       state.client.publish(`${action.path}/set`, JSON.stringify(action.payload))
       return state
 

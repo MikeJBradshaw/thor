@@ -2,10 +2,19 @@ import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
-import { MASTER_BATH_LIGHTS, MASTER_BATH_MOTION_SENSOR } from 'actions/master'
+import {
+  MASTER_BATH_LIGHTS,
+  MASTER_BATH_BUTTON_HOLD,
+  MASTER_BATH_BUTTON_RELEASE,
+  MASTER_BATH_MOTION_SENSOR
+} from 'actions/master'
 import { lightOnPublish, noop } from 'actions/mqttPublishClient'
 import type { RootState } from 'store'
-import type { MasterBathMotionSensorAction } from 'actions/master'
+import type {
+  MasterBathButtonHoldAction,
+  MasterBathButtonReleaseAction,
+  MasterBathMotionSensorAction
+} from 'actions/master'
 import type { LightOnPublish, Noop } from 'actions/mqttPublishClient'
 
 const BRIGHTNESS_HIGH = 255
@@ -53,4 +62,43 @@ const motionSensorEpic = (
   })
 )
 
-export default combineEpics(motionSensorEpic as any)
+type ButtonHoldEpicReturnType = Observable<LightOnPublish>
+const buttonHoldEpic = (
+  action$: Observable<MasterBathButtonHoldAction>,
+  state$: StateObservable<RootState>
+): ButtonHoldEpicReturnType => action$.pipe(
+  ofType(MASTER_BATH_BUTTON_HOLD),
+  switchMap(() => of(
+    lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
+    lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
+  ))
+)
+
+type ButtonReleaseEpicReturnType = Observable<LightOnPublish>
+const buttonReleaseEpic = (
+  action$: Observable<MasterBathButtonReleaseAction>,
+  state$: StateObservable<RootState>
+): ButtonReleaseEpicReturnType => action$.pipe(
+  ofType(MASTER_BATH_BUTTON_RELEASE),
+  switchMap(() => {
+    const date = new Date().toLocaleTimeString('en', { hour12: false })
+
+    if (isNight(date)) {
+      return of(
+        lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_LOW, color: { hex: RED } }),
+        lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_LOW, color: { hex: RED } })
+      )
+    }
+
+    return of(
+      lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
+      lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
+    )
+  })
+)
+
+export default combineEpics(
+  buttonHoldEpic as any,
+  buttonReleaseEpic as any,
+  motionSensorEpic as any
+)
