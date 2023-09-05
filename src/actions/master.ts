@@ -5,11 +5,11 @@ export const MASTER_BATH_LIGHTS = [
   'z2m/home/master_bath/light/light_2'
 ]
 
-export const MASTER_BATH_MOTION_SENSOR = 'MASTER_BATH_MOTION_SENSOR'
-export interface MasterBathMotionSensorAction { type: typeof MASTER_BATH_MOTION_SENSOR, payload: MotionSensorPayload }
-export const masterBathMotionSensor = (
-  payload: MotionSensorPayload
-): MasterBathMotionSensorAction => ({ type: MASTER_BATH_MOTION_SENSOR, payload })
+export const MASTER_BATH_BUTTON_CLICK = 'MASTER_BATH_BUTTON_CLICK'
+export interface MasterBathButtonClickAction { type: typeof MASTER_BATH_BUTTON_CLICK, payload: ButtonPayload }
+export const masterBathButtonClick = (
+  payload: ButtonPayload
+): MasterBathButtonClickAction => ({ type: MASTER_BATH_BUTTON_CLICK, payload })
 
 export const MASTER_BATH_BUTTON_HOLD = 'MASTER_BATH_BUTTON_HOLD'
 export interface MasterBathButtonHoldAction { type: typeof MASTER_BATH_BUTTON_HOLD, payload: ButtonPayload }
@@ -23,6 +23,13 @@ export const masterBathButtonRelease = (
   payload: ButtonPayload
 ): MasterBathButtonReleaseAction => ({ type: MASTER_BATH_BUTTON_RELEASE, payload })
 
-export type MasterAction = MasterBathMotionSensorAction
+export const MASTER_BATH_MOTION_SENSOR = 'MASTER_BATH_MOTION_SENSOR'
+export interface MasterBathMotionSensorAction { type: typeof MASTER_BATH_MOTION_SENSOR, payload: MotionSensorPayload }
+export const masterBathMotionSensor = (
+  payload: MotionSensorPayload
+): MasterBathMotionSensorAction => ({ type: MASTER_BATH_MOTION_SENSOR, payload })
+
+export type MasterAction = MasterBathButtonClickAction
 | MasterBathButtonHoldAction
 | MasterBathButtonReleaseAction
+| MasterBathMotionSensorAction

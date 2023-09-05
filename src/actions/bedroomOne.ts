@@ -1,10 +1,4 @@
-export enum ButtonState {
-  Default = 'default',
-  Single = 'single',
-  Double = 'double',
-  Hold = 'hold',
-  Release = 'release'
-}
+import { ButtonState } from 'payloads'
 
 export const BEDROOM_ONE_LIGHTS = [
   'z2m/home/lola/light/light_1',

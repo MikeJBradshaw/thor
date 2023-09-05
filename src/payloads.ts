@@ -24,3 +24,12 @@ export interface TemperatureAndHumdityPayload {
   linkQuality: number
   temperature: number
 }
+
+export enum ButtonState {
+  Default = 'default',
+  Single = 'single',
+  Double = 'double',
+  Hold = 'hold',
+  Release = 'release'
+}
+

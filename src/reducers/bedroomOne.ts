@@ -1,6 +1,7 @@
 import type { Reducer } from 'redux'
 
-import { ButtonState, BUTTON_CLICK, BUTTON_HOLD, BUTTON_RELEASE } from 'actions/bedroomOne'
+import { BUTTON_CLICK, BUTTON_HOLD, BUTTON_RELEASE } from 'actions/bedroomOne'
+import { ButtonState } from 'payloads'
 import type { BedroomOneAction } from 'actions/bedroomOne'
 
 // const RED = '#FF0000'

@@ -7,16 +7,21 @@ import type { IO } from 'fp-ts/lib/IO'
 
 import { buttonClick, buttonHold, buttonRelease } from 'actions/bedroomOne'
 import { motionSensor } from 'actions/laundry'
-import { masterBathMotionSensor, masterBathButtonHold, masterBathButtonRelease } from 'actions/master'
+import {
+  masterBathButtonClick,
+  masterBathButtonHold,
+  masterBathButtonRelease,
+  masterBathMotionSensor
+} from 'actions/master'
 import routes from 'routes'
-import store from '../src/store'
+import store from 'store'
 
 /**************
  * ZIBGEE
  * ***********/
 const TEST_ADDRESS = '10.243.31.95'
 const LOCALHOST = 'localhost'
-const LEVEL = process.env.level === 'test' ? 'test' : 'production'
+const LEVEL = process.env.level === 'test' ? 'test' : 'production' // TODO: exit if not test or production
 const CONNECTION_STRING = `mqtt://${LEVEL === 'test' ? TEST_ADDRESS : LOCALHOST}:1883`
 const DEBUG_STATE = process.env.debug_state === 'true'
 const LOG_PUBLISH = process.env.log_publish === 'true'
@@ -85,10 +90,10 @@ client.on('connect', () => {
                 case 'release':
                   store.dispatch(masterBathButtonRelease(data))
                   break
-                // case 'single':
+                case 'single':
                 // case 'double':
-                  // store.dispatch(buttonClick(data.action))
-                  // break
+                  store.dispatch(masterBathButtonClick(data))
+                  break
                 default:
                   break
               }

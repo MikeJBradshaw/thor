@@ -1,16 +1,19 @@
-import { Observable, of } from 'rxjs'
-import { switchMap } from 'rxjs/operators'
+import { Observable, of, timer } from 'rxjs'
+import { switchMap, map } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
   MASTER_BATH_LIGHTS,
+  MASTER_BATH_BUTTON_CLICK,
   MASTER_BATH_BUTTON_HOLD,
   MASTER_BATH_BUTTON_RELEASE,
   MASTER_BATH_MOTION_SENSOR
 } from 'actions/master'
 import { lightOnPublish, noop } from 'actions/mqttPublishClient'
+import { ButtonState } from 'payloads'
 import type { RootState } from 'store'
 import type {
+  MasterBathButtonClickAction,
   MasterBathButtonHoldAction,
   MasterBathButtonReleaseAction,
   MasterBathMotionSensorAction
@@ -97,7 +100,44 @@ const buttonReleaseEpic = (
   })
 )
 
+type ButtonClickEpicReturnType = Observable<LightOnPublish | Noop>
+const buttonClickEpic = (
+  action$: Observable<MasterBathButtonClickAction>,
+  state$: StateObservable<RootState>
+): ButtonClickEpicReturnType => action$.pipe(
+  ofType(MASTER_BATH_BUTTON_CLICK),
+  switchMap(() => {
+    const buttonAction = state$.value.masterReducer.buttonState.action
+    if (buttonAction === ButtonState.Single) {
+      return of(
+        lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
+        lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
+      )
+    }
+
+    if (buttonAction === ButtonState.Default) {
+      const date = new Date().toLocaleTimeString('en', { hour12: false })
+
+      if (isNight(date)) {
+        return of(
+          lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_LOW, color: { hex: RED } }),
+          lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_LOW, color: { hex: RED } })
+        )
+      }
+
+      return of(
+        lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
+        lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
+      )
+    }
+
+    // we dont handle double click right now
+    return of(noop())
+  })
+)
+
 export default combineEpics(
+  buttonClickEpic as any,
   buttonHoldEpic as any,
   buttonReleaseEpic as any,
   motionSensorEpic as any
