@@ -38,21 +38,22 @@ const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, ac
       const oldAction = state.buttonState.action
       const buttonAction = action.payload.action
 
+      // want to set default IFF we are currently not in default mode AND old and new actions agree
       if (oldAction !== ButtonState.Default && oldAction === buttonAction) {
         return {
           ...state,
           overrideMasterBathMotionSensor: false,
           buttonState: {
             ...state.buttonState,
+            ...action.payload,
             action: ButtonState.Default
           }
         }
       }
 
-      // we are in default mode, take new state or something like single and new action is double
       return {
         ...state,
-        overrideMasterBathMotionSensor: buttonAction === ButtonState.Single,
+        overrideMasterBathMotionSensor: true,
         buttonstate: action.payload
       }
     }

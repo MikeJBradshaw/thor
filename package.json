@@ -17,9 +17,9 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6"
   },
-  "name": "thor",
+  "name": "VALHALLA",
   "version": "0.0.1",
-  "description": "Total Home Organization and Responsiveness",
+  "description": "Versatile Automation and Lifestyle Hub with Advanced Lighting and Logic Assistance (VALHALLA)",
   "main": "app.ts",
   "scripts": {
     "build": "tsc -p .",
