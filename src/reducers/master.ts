@@ -26,7 +26,7 @@ const initState: MasterState = {
     occupancy: false
   },
   buttonState: {
-    action: 'default',
+    action: ButtonState.Default,
     battery: -1,
     linkquality: -1
   }
@@ -49,6 +49,11 @@ const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, ac
             action: ButtonState.Default
           }
         }
+      }
+
+      // double click not supported
+      if (buttonAction === ButtonState.Double) {
+        return state
       }
 
       return {
