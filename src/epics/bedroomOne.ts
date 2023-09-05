@@ -76,20 +76,8 @@ const buttonClickEpic = (
     const brightness = state$.value.bedroomOneReducer.defaultState.values.brightness
 
     return of(
-      lightOnPublish(
-        BEDROOM_ONE_LIGHTS[0],
-        {
-          brightness,
-          ...colorPackage
-        }
-      ),
-      lightOnPublish(
-        BEDROOM_ONE_LIGHTS[1],
-        {
-          brightness,
-          ...colorPackage
-        }
-      )
+      lightOnPublish(BEDROOM_ONE_LIGHTS[0], { brightness, ...colorPackage }),
+      lightOnPublish(BEDROOM_ONE_LIGHTS[1], { brightness, ...colorPackage })
     )
   })
 )

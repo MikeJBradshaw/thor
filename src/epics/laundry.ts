@@ -23,13 +23,13 @@ const motionSensorEpic = (
     } else {
       if (occupancy) {
         return of(
-          lightOnPublish(LAUNDRY_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
-          lightOnPublish(LAUNDRY_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
+          lightOnPublish(LAUNDRY_LIGHTS[0], { brightness: BRIGHTNESS_HIGH }),
+          lightOnPublish(LAUNDRY_LIGHTS[1], { brightness: BRIGHTNESS_HIGH })
         )
       }
       return of(
-        lightOnPublish(LAUNDRY_LIGHTS[0], { brightness: BRIGHTNESS_OFF, color_temp: 'neutral' }),
-        lightOnPublish(LAUNDRY_LIGHTS[1], { brightness: BRIGHTNESS_OFF, color_temp: 'neutral' })
+        lightOnPublish(LAUNDRY_LIGHTS[0], { brightness: BRIGHTNESS_OFF }),
+        lightOnPublish(LAUNDRY_LIGHTS[1], { brightness: BRIGHTNESS_OFF })
       )
     }
   })

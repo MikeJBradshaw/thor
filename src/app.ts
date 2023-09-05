@@ -18,10 +18,12 @@ const TEST_ADDRESS = '10.243.31.95'
 const LOCALHOST = 'localhost'
 const LEVEL = process.env.level === 'test' ? 'test' : 'production'
 const CONNECTION_STRING = `mqtt://${LEVEL === 'test' ? TEST_ADDRESS : LOCALHOST}:1883`
+const DEBUG_STATE = process.env.debug_state === 'true' ? true : false
 
 console.log('###########################################################')
 console.log('LEVEL:', LEVEL)
 console.log('CONNECTION_STRING:', CONNECTION_STRING)
+console.log('DEBUG_STATE', DEBUG_STATE)
 console.log('###########################################################')
 
 const client: MqttClient = connect(CONNECTION_STRING)
@@ -86,7 +88,14 @@ client.on('connect', () => {
 })
 
 console.log('SUBSCRIPTION TO ZIGBEE PIPE')
-const unsubscribe = store.subscribe(() => {})
+const unsubscribe = store.subscribe(() => {
+  if (!DEBUG_STATE) {
+    return
+  }
+
+  const { mqttPublishClientReducer, ...printableState } = store.getState()
+  console.log(printableState)
+})
 
 /****************
  * MARBLE
