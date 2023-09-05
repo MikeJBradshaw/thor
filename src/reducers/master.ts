@@ -59,7 +59,7 @@ const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, ac
       return {
         ...state,
         overrideMasterBathMotionSensor: true,
-        buttonstate: action.payload
+        buttonState: action.payload
       }
     }
 
