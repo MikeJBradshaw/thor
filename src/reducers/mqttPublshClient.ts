@@ -27,7 +27,7 @@ const mqttPublishClientReducer: Reducer<MqttClientState, MqttClientAction> = (st
 
   switch (action.type) {
     case LIGHT_ON_PUBLISH:
-      state.client.publish(action.path, JSON.stringify(action.payload))
+      state.client.publish(`${action.path}/set`, JSON.stringify(action.payload))
       return state
 
     default:

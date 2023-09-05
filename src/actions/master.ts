@@ -1,8 +1,8 @@
 import type { MotionSensor } from 'payloads'
 
 export const MASTER_BATH_LIGHTS = [
-  'z2m/home/master_bath/light/light_1/set',
-  'z2m/home/master_bath/light/light_2/set'
+  'z2m/home/master_bath/light/light_1',
+  'z2m/home/master_bath/light/light_2'
 ]
 
 export const MASTER_BATH_MOTION_SENSOR = 'MASTER_BATH_MOTION_SENSOR'

@@ -3,8 +3,8 @@ import type { MotionSensor } from 'payloads'
 const BRIGHTNESS_HIGH = 255 // TODO: pull to constants
 
 export const LAUNDRY_LIGHTS = [
-  'z2m/home/laundry/light/light_1/',
-  'z2m/home/laundry/light/light_2/'
+  'z2m/home/laundry/light/light_1',
+  'z2m/home/laundry/light/light_2'
 ]
 
 export const MOTION_SENSOR = 'LAUNDRY_MOTION_SENSOR'
