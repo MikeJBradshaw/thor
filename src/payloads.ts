@@ -1,5 +1,13 @@
+export enum ButtonState {
+  Default = 'default',
+  Single = 'single',
+  Double = 'double',
+  Hold = 'hold',
+  Release = 'release'
+}
+
 export interface ButtonPayload {
-  action: string
+  action: ButtonState
   battery: number
   linkquality: number
 }
@@ -23,14 +31,6 @@ export interface TemperatureAndHumdityPayload {
   humidity: number
   linkQuality: number
   temperature: number
-}
-
-export enum ButtonState {
-  Default = 'default',
-  Single = 'single',
-  Double = 'double',
-  Hold = 'hold',
-  Release = 'release'
 }
 
 export interface Action {

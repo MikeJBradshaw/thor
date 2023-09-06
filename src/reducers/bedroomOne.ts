@@ -1,7 +1,7 @@
 import type { Reducer } from 'redux'
 
-import { BUTTON_CLICK, BUTTON_HOLD, BUTTON_RELEASE } from 'actions/bedroomOne'
-import { ButtonState } from 'payloads'
+import { BEDROOM_ONE_BUTTON_CLICK, BEDROOM_ONE_BUTTON_HOLD, BEDROOM_ONE_BUTTON_RELEASE } from 'actions/bedroomOne'
+import { ButtonState, ButtonPayload } from 'payloads'
 import type { BedroomOneAction } from 'actions/bedroomOne'
 
 // const RED = '#FF0000'
@@ -19,7 +19,8 @@ interface LightValues {
 }
 
 interface BedroomOneState {
-  buttonState: ButtonState
+  buttonState: ButtonPayload
+  roomSetup: ButtonState
   overrideLights: boolean
   defaultState: {
     type: 'color-light' | 'white-light'
@@ -37,7 +38,12 @@ interface BedroomOneState {
 }
 
 const initState: BedroomOneState = {
-  buttonState: ButtonState.Default,
+  buttonState: {
+    action: ButtonState.Default,
+    battery: -1,
+    linkquality: -1
+  },
+  roomSetup: ButtonState.Default,
   overrideLights: false,
   defaultState: {
     type: 'color-light',
@@ -68,27 +74,28 @@ const initState: BedroomOneState = {
 
 const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = initState, action) => {
   switch (action.type) {
-    case BUTTON_CLICK: {
-      const currentButtonState = state.buttonState
-      if (action.state !== currentButtonState) {
+    case BEDROOM_ONE_BUTTON_CLICK: {
+      if (action.payload.action !== state.roomSetup) {
         return {
           ...state,
-          buttonState: action.state
+          buttonState: action.payload,
+          roomSetup: ButtonState.Default
         }
       }
 
       return {
         ...state,
-        buttonState: (currentButtonState === ButtonState.Default ? action.state : ButtonState.Default)
+        buttonState: action.payload,
+        roomSetup: action.payload.action
       }
     }
 
-    case BUTTON_HOLD: {
-      return { ...state, overrideLights: true }
+    case BEDROOM_ONE_BUTTON_HOLD: {
+      return { ...state, buttonState: action.payload, overrideLights: true }
     }
 
-    case BUTTON_RELEASE: {
-      return { ...state, overrideLights: false }
+    case BEDROOM_ONE_BUTTON_RELEASE: {
+      return { ...state, buttonState: action.payload, overrideLights: false }
     }
 
     default:

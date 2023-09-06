@@ -5,7 +5,11 @@ import { bodyParser$ } from '@marblejs/middleware-body'
 import type { MqttClient } from 'mqtt'
 import type { IO } from 'fp-ts/lib/IO'
 
-import { buttonClick, buttonHold, buttonRelease } from 'actions/bedroomOne' // TODO: fix this naming
+import {
+  bedroomOneButtonClick,
+  bedroomOneButtonHold,
+  bedroomOneButtonRelease
+} from 'actions/bedroomOne' // TODO: fix this naming
 import { motionSensor } from 'actions/laundry' // TODO: fix this naming
 import {
   masterBathButtonClick,
@@ -57,13 +61,13 @@ export const bedroomOneRouter = (device: string, buffer: Buffer): void => {
     switch (data.action) {
       case ButtonState.Single:
       case ButtonState.Double:
-        store.dispatch(buttonClick(data))
+        store.dispatch(bedroomOneButtonClick(data))
         return
       case ButtonState.Hold:
-        store.dispatch(buttonHold())
+        store.dispatch(bedroomOneButtonHold(data))
         return
       case ButtonState.Release:
-        store.dispatch(buttonRelease())
+        store.dispatch(bedroomOneButtonRelease(data))
     }
   }
 }
@@ -110,7 +114,6 @@ client.on('connect', () => {
 
     client.on('message', (topic, buffer) => {
       const [_, __, entity, device] = topic.split('/')
-      const data = JSON.parse(buffer.toString())
 
       switch (entity) {
         case BEDROOM_ONE:
@@ -137,7 +140,7 @@ client.on('connect', () => {
 })
 
 console.log('SUBSCRIPTION TO ZIGBEE PIPE')
-const unsubscribe = store.subscribe(() => {
+store.subscribe(() => {
   if (!DEBUG_STATE) {
     return
   }

@@ -5,28 +5,28 @@ import { combineEpics, ofType, StateObservable } from 'redux-observable'
 import {
   BEDROOM_ONE_LIGHTS_GROUP,
   BEDROOM_ONE_POWER_ONE,
-  BUTTON_CLICK
+  BEDROOM_ONE_BUTTON_CLICK
 } from 'actions/bedroomOne'
 import { lightOnPublish, noop, powerOn, powerOff } from 'actions/mqttClient'
 import { ButtonState } from 'payloads'
 import type { RootState } from 'store'
-import type { ButtonClickAction } from 'actions/bedroomOne'
+import type { BedroomOneButtonClickAction } from 'actions/bedroomOne'
 import type { LightOnPublish, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
 
 type ButtonClickedEpicReturnType = Observable<LightOnPublish | Noop | PowerOn | PowerOff>
 const buttonClickEpic = (
-  action$: Observable<ButtonClickAction>,
+  action$: Observable<BedroomOneButtonClickAction>,
   state$: StateObservable<RootState>
 ): ButtonClickedEpicReturnType => action$.pipe(
-  ofType(BUTTON_CLICK),
-  switchMap(({ state }) => {
-    const currentButtonState = state$.value.bedroomOneReducer.buttonState
+  ofType(BEDROOM_ONE_BUTTON_CLICK),
+  switchMap(({ payload: { action } }) => {
+    const currentRoomSetup = state$.value.bedroomOneReducer.roomSetup
     const override = state$.value.bedroomOneReducer.overrideLights
     if (override) {
       of(noop())
     }
 
-    if (currentButtonState === ButtonState.Double) {
+    if (currentRoomSetup === ButtonState.Double) {
       const stateType = state$.value.bedroomOneReducer.doubleClickState.type
       const colorPackage = (stateType === 'color-light')
         ? { color: { hex: state$.value.bedroomOneReducer.doubleClickState.values.color } }
@@ -44,7 +44,7 @@ const buttonClickEpic = (
       )
     }
 
-    if (currentButtonState === ButtonState.Single) {
+    if (currentRoomSetup === ButtonState.Single) {
       const stateType = state$.value.bedroomOneReducer.singleClickState.type
       const colorPackage = (stateType === 'color-light')
         ? { color: { hex: state$.value.bedroomOneReducer.singleClickState.values.color } }

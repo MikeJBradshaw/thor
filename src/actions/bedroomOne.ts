@@ -1,4 +1,4 @@
-import { ButtonState } from 'payloads'
+import { ButtonPayload } from 'payloads'
 
 /***************
  * DEVICES
@@ -9,21 +9,24 @@ export const BEDROOM_ONE_LIGHT_2 = 'z2m/home/bedroom_1/light/light_2'
 
 export const BEDROOM_ONE_POWER_ONE = 'z2m/home/lola/power/sound_machine'
 
-type ButtonStandardStates = ButtonState.Default | ButtonState.Double | ButtonState.Single
-export const BUTTON_CLICK = 'BEDROOM_ONE_BUTTON_CLICK'
-export interface ButtonClickAction { type: typeof BUTTON_CLICK, state: ButtonStandardStates }
-export const buttonClick = (
-  state: ButtonStandardStates
-): ButtonClickAction => ({ type: BUTTON_CLICK, state })
+export const BEDROOM_ONE_BUTTON_CLICK = 'BEDROOM_ONE_BUTTON_CLICK'
+export interface BedroomOneButtonClickAction { type: typeof BEDROOM_ONE_BUTTON_CLICK, payload: ButtonPayload }
+export const bedroomOneButtonClick = (
+  payload: ButtonPayload
+): BedroomOneButtonClickAction => ({ type: BEDROOM_ONE_BUTTON_CLICK, payload })
 
-export const BUTTON_HOLD = 'BEDROOM_ONE_BUTTON_HOLD'
-export interface ButtonHoldAction { type: typeof BUTTON_HOLD }
-export const buttonHold = (): ButtonHoldAction => ({ type: BUTTON_HOLD })
+export const BEDROOM_ONE_BUTTON_HOLD = 'BEDROOM_ONE_BUTTON_HOLD'
+export interface BedroomOneButtonHoldAction { type: typeof BEDROOM_ONE_BUTTON_HOLD, payload: ButtonPayload }
+export const bedroomOneButtonHold = (
+  payload: ButtonPayload
+): BedroomOneButtonHoldAction => ({ type: BEDROOM_ONE_BUTTON_HOLD, payload })
 
-export const BUTTON_RELEASE = 'BEDROOM_ONE_BUTTON_RELEASE'
-export interface ButtonReleaseAction { type: typeof BUTTON_RELEASE }
-export const buttonRelease = (): ButtonReleaseAction => ({ type: BUTTON_RELEASE })
+export const BEDROOM_ONE_BUTTON_RELEASE = 'BEDROOM_ONE_BUTTON_RELEASE'
+export interface BedroomOneButtonReleaseAction { type: typeof BEDROOM_ONE_BUTTON_RELEASE, payload: ButtonPayload }
+export const bedroomOneButtonRelease = (
+  payload: ButtonPayload
+): BedroomOneButtonReleaseAction => ({ type: BEDROOM_ONE_BUTTON_RELEASE, payload })
 
-export type BedroomOneAction = ButtonClickAction
-| ButtonHoldAction
-| ButtonReleaseAction
+export type BedroomOneAction = BedroomOneButtonClickAction
+| BedroomOneButtonHoldAction
+| BedroomOneButtonReleaseAction
