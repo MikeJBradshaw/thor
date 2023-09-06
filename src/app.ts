@@ -5,14 +5,27 @@ import { bodyParser$ } from '@marblejs/middleware-body'
 import type { MqttClient } from 'mqtt'
 import type { IO } from 'fp-ts/lib/IO'
 
-import { buttonClick, buttonHold, buttonRelease } from 'actions/bedroomOne'
-import { motionSensor } from 'actions/laundry'
+import { buttonClick, buttonHold, buttonRelease } from 'actions/bedroomOne' // TODO: fix this naming
+import { motionSensor } from 'actions/laundry' // TODO: fix this naming
 import {
   masterBathButtonClick,
   masterBathButtonHold,
   masterBathButtonRelease,
   masterBathMotionSensor
 } from 'actions/master'
+import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
+import {
+  BEDROOM_ONE,
+  BUTTON,
+  CHICKEN_COOP,
+  LAUNDRY,
+  MASTER_BATH,
+  MOTION_SENSOR,
+  PRODUCTION,
+  TEMP_HUMIDITY,
+  TEST
+} from 'consts'
+import { ButtonState } from 'payloads'
 import routes from 'routes'
 import store from 'store'
 
@@ -21,7 +34,12 @@ import store from 'store'
  * ***********/
 const TEST_ADDRESS = '10.243.31.95'
 const LOCALHOST = 'localhost'
-const LEVEL = process.env.level === 'test' ? 'test' : 'production' // TODO: exit if not test or production
+const LEVEL = process.env.level
+if (LEVEL !== TEST && LEVEL !== PRODUCTION) {
+  process.exitCode = -2
+  console.error('Env "level" is not of "test" or "production"')
+  process.exit()
+}
 const CONNECTION_STRING = `mqtt://${LEVEL === 'test' ? TEST_ADDRESS : LOCALHOST}:1883`
 const DEBUG_STATE = process.env.debug_state === 'true'
 const LOG_PUBLISH = process.env.log_publish === 'true'
@@ -32,6 +50,53 @@ console.log('DEBUG_STATE:      ', DEBUG_STATE)
 console.log('LOG_PUBLISH:      ', LOG_PUBLISH)
 console.log('CONNECTION_STRING:', CONNECTION_STRING)
 console.log('###########################################################')
+
+export const bedroomOneRouter = (device: string, buffer: Buffer): void => {
+  const data = JSON.parse(buffer.toString())
+  if (device === BUTTON) {
+    switch (data.action) {
+      case ButtonState.Single:
+      case ButtonState.Double:
+        store.dispatch(buttonClick(data))
+        return
+      case ButtonState.Hold:
+        store.dispatch(buttonHold())
+        return
+      case ButtonState.Release:
+        store.dispatch(buttonRelease())
+    }
+  }
+}
+
+export const chickenCoopRouter = (device: string, buffer: Buffer): void => {
+  if (device === TEMP_HUMIDITY) { store.dispatch(temperatureHumidity(JSON.parse(buffer.toString()))) }
+}
+
+export const laundryRouter = (device: string, buffer: Buffer): void => {
+  if (device === MOTION_SENSOR) { store.dispatch(motionSensor(JSON.parse(buffer.toString()))) }
+}
+
+export const masterBathRouter = (device: string, buffer: Buffer): void => {
+  const data = JSON.parse(buffer.toString())
+  if (device === MOTION_SENSOR) {
+    store.dispatch(masterBathMotionSensor(data))
+    return
+  }
+
+  if (device === BUTTON) {
+    switch (data.action) {
+      case ButtonState.Single:
+      case ButtonState.Double:
+        store.dispatch(masterBathButtonClick(data))
+        return
+      case ButtonState.Hold:
+        store.dispatch(masterBathButtonHold(data))
+        return
+      case ButtonState.Release:
+        store.dispatch(masterBathButtonRelease(data))
+    }
+  }
+}
 
 const client: MqttClient = connect(CONNECTION_STRING)
 client.on('connect', () => {
@@ -48,60 +113,20 @@ client.on('connect', () => {
       const data = JSON.parse(buffer.toString())
 
       switch (entity) {
-        case 'bedroom_1':
-
-          switch (data.action) {
-            case 'hold':
-              store.dispatch(buttonHold())
-              break
-            case 'release':
-              store.dispatch(buttonRelease())
-              break
-            case 'single':
-            case 'double':
-              store.dispatch(buttonClick(data.action))
-              break
-            default:
-              break
-          }
+        case BEDROOM_ONE:
+          bedroomOneRouter(device, buffer)
           break
 
-        case 'laundry':
-          switch (device) {
-            case 'motion_sensor':
-              store.dispatch(motionSensor(data))
-              break
-            default:
-              break
-          }
+        case CHICKEN_COOP:
+          chickenCoopRouter(device, buffer)
           break
 
-        case 'master_bath':
-          switch (device) {
-            case 'motion_sensor':
-              store.dispatch(masterBathMotionSensor(data))
-              break
+        case LAUNDRY:
+          laundryRouter(device, buffer)
+          break
 
-            case 'button':
-              switch (data.action) {
-                case 'hold':
-                  store.dispatch(masterBathButtonHold(data))
-                  break
-                case 'release':
-                  store.dispatch(masterBathButtonRelease(data))
-                  break
-                case 'single':
-                // case 'double':
-                  store.dispatch(masterBathButtonClick(data))
-                  break
-                default:
-                  break
-              }
-              break
-
-            default:
-              break
-          }
+        case MASTER_BATH:
+          masterBathRouter(device, buffer)
           break
 
         default:

@@ -41,20 +41,3 @@ export const chickenCoopTempHumidityEpic = (
   })
 )
 
-// const BATTERY_ALERT_THRESHOLD = 30
-// const BATTERY_CRITICAL_THRESHOLD = 10
-
-// type BatteryAlertingReturnType = Observable<BatteryWarningAction | BatteryCriticalAction>
-// export const chickenCoopBatteryEpic = (
-//   event$: Observable<TemperatureHumidityEvent>
-// ): BatteryAlertingReturnType => event$.pipe(
-//   ofEvent('chicken_coop', 'temp_humidity'),
-//   filter(({ payload: { battery } }) => battery < BATTERY_ALERT_THRESHOLD),
-//   map(({
-//     payload: { battery },
-//     entity,
-//     device
-//   }) => battery >= BATTERY_CRITICAL_THRESHOLD
-//     ? batteryCritical(battery, entity, device)
-//     : batteryWarning(battery, entity, device))
-// )
