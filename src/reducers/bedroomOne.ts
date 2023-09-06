@@ -92,7 +92,7 @@ const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = i
         return {
           ...state,
           buttonState: action.payload,
-          roomSetup: ROOM_STATE_DOUBLE
+          roomSetup: ROOM_STATE_DEFAULT
         }
       }
 
