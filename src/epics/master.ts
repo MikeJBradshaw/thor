@@ -3,7 +3,7 @@ import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
-  MASTER_BATH_LIGHTS,
+  LIGHTS_GROUP,
   MASTER_BATH_BUTTON_CLICK,
   MASTER_BATH_BUTTON_HOLD,
   MASTER_BATH_BUTTON_RELEASE,
@@ -46,21 +46,13 @@ const motionSensorEpic = (
         const date = new Date().toLocaleTimeString('en', { hour12: false })
 
         if (isNight(date)) {
-          return of(
-            lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_LOW, color: { hex: RED } }),
-            lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_LOW, color: { hex: RED } })
-          )
+          return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: RED } }))
         }
-        return of(
-          lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
-          lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
-        )
+
+        return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
       }
 
-      return of(
-        lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_OFF, color_temp: 'neutral' }),
-        lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_OFF, color_temp: 'neutral' })
-      )
+      return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_OFF, color_temp: 'neutral' }))
     }
   })
 )
@@ -71,10 +63,7 @@ const buttonHoldEpic = (
   state$: StateObservable<RootState>
 ): ButtonHoldEpicReturnType => action$.pipe(
   ofType(MASTER_BATH_BUTTON_HOLD),
-  switchMap(() => of(
-    lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
-    lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
-  ))
+  switchMap(() => of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })))
 )
 
 type ButtonReleaseEpicReturnType = Observable<LightOnPublish>
@@ -87,16 +76,10 @@ const buttonReleaseEpic = (
     const date = new Date().toLocaleTimeString('en', { hour12: false })
 
     if (isNight(date)) {
-      return of(
-        lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_LOW, color: { hex: RED } }),
-        lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_LOW, color: { hex: RED } })
-      )
+      return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: RED } }))
     }
 
-    return of(
-      lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
-      lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
-    )
+    return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
   })
 )
 
@@ -109,26 +92,17 @@ const buttonClickEpic = (
   switchMap(() => {
     const buttonAction = state$.value.masterReducer.buttonState.action
     if (buttonAction === ButtonState.Single) {
-      return of(
-        lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
-        lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
-      )
+      return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
     }
 
     if (buttonAction === ButtonState.Default) {
       const date = new Date().toLocaleTimeString('en', { hour12: false })
 
       if (isNight(date)) {
-        return of(
-          lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_LOW, color: { hex: RED } }),
-          lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_LOW, color: { hex: RED } })
-        )
+        return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: RED } }))
       }
 
-      return of(
-        lightOnPublish(MASTER_BATH_LIGHTS[0], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }),
-        lightOnPublish(MASTER_BATH_LIGHTS[1], { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' })
-      )
+      return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
     }
 
     // we dont handle double click right now

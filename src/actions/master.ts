@@ -1,9 +1,8 @@
 import type { ButtonPayload, MotionSensorPayload } from 'payloads'
 
-export const MASTER_BATH_LIGHTS = [
-  'z2m/home/master_bath/light/light_1',
-  'z2m/home/master_bath/light/light_2'
-]
+export const LIGHTS_GROUP = 'z2m/master_bath_lights'
+export const MASTER_BATH_LIGHT_1 = 'z2m/home/master_bath/light/light_1'
+export const MASTER_BATH_LIGHT_2 = 'z2m/home/master_bath/light/light_2'
 
 export const MASTER_BATH_BUTTON_CLICK = 'MASTER_BATH_BUTTON_CLICK'
 export interface MasterBathButtonClickAction { type: typeof MASTER_BATH_BUTTON_CLICK, payload: ButtonPayload }
