@@ -1,7 +1,16 @@
 import type { Reducer } from 'redux'
 
 import { BEDROOM_ONE_BUTTON_CLICK, BEDROOM_ONE_BUTTON_HOLD, BEDROOM_ONE_BUTTON_RELEASE } from 'actions/bedroomOne'
-import { ButtonState, ButtonPayload } from 'payloads'
+import { ButtonPayload } from 'payloads'
+import {
+  BUTTON_STATE_DOUBLE,
+  BUTTON_STATE_HOLD,
+  BUTTON_STATE_RELEASE,
+  BUTTON_STATE_SINGLE,
+  ROOM_STATE_DEFAULT,
+  ROOM_STATE_DOUBLE,
+  ROOM_STATE_SINGLE
+} from 'consts'
 import type { BedroomOneAction } from 'actions/bedroomOne'
 
 // const RED = '#FF0000'
@@ -20,7 +29,7 @@ interface LightValues {
 
 interface BedroomOneState {
   buttonState: ButtonPayload
-  roomSetup: ButtonState
+  roomSetup: string
   overrideLights: boolean
   defaultState: {
     type: 'color-light' | 'white-light'
@@ -39,11 +48,11 @@ interface BedroomOneState {
 
 const initState: BedroomOneState = {
   buttonState: {
-    action: ButtonState.Default,
+    action: '',
     battery: -1,
     linkquality: -1
   },
-  roomSetup: ButtonState.Default,
+  roomSetup: ROOM_STATE_DEFAULT,
   overrideLights: false,
   defaultState: {
     type: 'color-light',
@@ -75,18 +84,33 @@ const initState: BedroomOneState = {
 const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = initState, action) => {
   switch (action.type) {
     case BEDROOM_ONE_BUTTON_CLICK: {
-      if (action.payload.action !== state.roomSetup) {
+      // single -> single || double -> double
+      const roomSetup = state.roomSetup
+      const buttonAction = action.payload.action
+      if ((buttonAction === BUTTON_STATE_SINGLE && roomSetup === ROOM_STATE_SINGLE) ||
+          (buttonAction === BUTTON_STATE_DOUBLE && roomSetup === ROOM_STATE_DOUBLE)) {
         return {
           ...state,
           buttonState: action.payload,
-          roomSetup: ButtonState.Default
+          roomSetup: ROOM_STATE_DOUBLE
         }
       }
 
+      // single -> double || double -> single
+      if ((roomSetup === ROOM_STATE_SINGLE && buttonAction === BUTTON_STATE_DOUBLE) ||
+          (roomSetup === ROOM_STATE_DOUBLE && buttonAction === BUTTON_STATE_SINGLE)) {
+        return {
+          ...state,
+          buttonState: action.payload,
+          roomSetup: (action.payload.action === BUTTON_STATE_SINGLE) ? ROOM_STATE_SINGLE : ROOM_STATE_DOUBLE
+        }
+      }
+
+      // default -> something else
       return {
         ...state,
         buttonState: action.payload,
-        roomSetup: action.payload.action
+        roomSetup: action.payload.action === BUTTON_STATE_SINGLE ? ROOM_STATE_SINGLE : ROOM_STATE_DOUBLE
       }
     }
 

@@ -10,7 +10,7 @@ import {
   MASTER_BATH_MOTION_SENSOR
 } from 'actions/master'
 import { lightOnPublish, noop } from 'actions/mqttClient'
-import { ButtonState } from 'payloads'
+import { ROOM_STATE_DEFAULT, ROOM_STATE_SINGLE } from 'consts'
 import type { RootState } from 'store'
 import type {
   MasterBathButtonClickAction,
@@ -91,11 +91,11 @@ const buttonClickEpic = (
   ofType(MASTER_BATH_BUTTON_CLICK),
   switchMap(() => {
     const buttonAction = state$.value.masterReducer.buttonState.action
-    if (buttonAction === ButtonState.Single) {
+    if (buttonAction === ROOM_STATE_SINGLE) { // TODO: need to add room state
       return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
     }
 
-    if (buttonAction === ButtonState.Default) {
+    if (buttonAction === ROOM_STATE_DEFAULT) { // TODO: need to add room state
       const date = new Date().toLocaleTimeString('en', { hour12: false })
 
       if (isNight(date)) {

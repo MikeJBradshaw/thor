@@ -6,7 +6,10 @@ import {
   MASTER_BATH_BUTTON_RELEASE,
   MASTER_BATH_MOTION_SENSOR
 } from 'actions/master'
-import { ButtonState } from 'payloads'
+import {
+  ROOM_STATE_DEFAULT,
+  ROOM_STATE_DOUBLE
+} from 'consts'
 import type { MasterAction } from 'actions/master'
 import type { ButtonPayload, MotionSensorPayload } from 'payloads'
 
@@ -26,7 +29,7 @@ const initState: MasterState = {
     occupancy: false
   },
   buttonState: {
-    action: ButtonState.Default,
+    action: '',
     battery: -1,
     linkquality: -1
   }
@@ -39,20 +42,20 @@ const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, ac
       const buttonAction = action.payload.action
 
       // want to set default IFF we are currently not in default mode AND old and new actions agree
-      if (oldAction !== ButtonState.Default && oldAction === buttonAction) {
+      if (oldAction !== ROOM_STATE_DEFAULT && oldAction === buttonAction) {
         return {
           ...state,
           overrideMasterBathMotionSensor: false,
           buttonState: {
             ...state.buttonState,
             ...action.payload,
-            action: ButtonState.Default
+            action: ROOM_STATE_DEFAULT
           }
         }
       }
 
       // double click not supported
-      if (buttonAction === ButtonState.Double) {
+      if (buttonAction === ROOM_STATE_DOUBLE) {
         return state
       }
 

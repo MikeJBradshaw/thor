@@ -17,3 +17,15 @@ export const TEMP_HUMIDITY = 'temp_humidity'
  * ***************************/
 export const PRODUCTION = 'production'
 export const TEST = 'test'
+
+/*****************************
+ * general
+ * **************************/
+export const BUTTON_STATE_SINGLE = 'single'
+export const BUTTON_STATE_DOUBLE = 'double'
+export const BUTTON_STATE_HOLD = 'hold'
+export const BUTTON_STATE_RELEASE = 'release'
+
+export const ROOM_STATE_DEFAULT = 'default'
+export const ROOM_STATE_SINGLE = 'single'
+export const ROOM_STATE_DOUBLE = 'double'

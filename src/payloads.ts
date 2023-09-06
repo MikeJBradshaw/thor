@@ -1,13 +1,5 @@
-export enum ButtonState {
-  Default = 'default',
-  Single = 'single',
-  Double = 'double',
-  Hold = 'hold',
-  Release = 'release'
-}
-
 export interface ButtonPayload {
-  action: ButtonState
+  action: string
   battery: number
   linkquality: number
 }

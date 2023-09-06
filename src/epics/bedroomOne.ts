@@ -2,13 +2,9 @@ import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
-import {
-  BEDROOM_ONE_LIGHTS_GROUP,
-  BEDROOM_ONE_POWER_ONE,
-  BEDROOM_ONE_BUTTON_CLICK
-} from 'actions/bedroomOne'
+import { BEDROOM_ONE_LIGHTS_GROUP, BEDROOM_ONE_POWER_ONE, BEDROOM_ONE_BUTTON_CLICK } from 'actions/bedroomOne'
 import { lightOnPublish, noop, powerOn, powerOff } from 'actions/mqttClient'
-import { ButtonState } from 'payloads'
+import { ROOM_STATE_DOUBLE, ROOM_STATE_SINGLE } from 'consts'
 import type { RootState } from 'store'
 import type { BedroomOneButtonClickAction } from 'actions/bedroomOne'
 import type { LightOnPublish, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
@@ -26,7 +22,7 @@ const buttonClickEpic = (
       of(noop())
     }
 
-    if (currentRoomSetup === ButtonState.Double) {
+    if (currentRoomSetup === ROOM_STATE_DOUBLE) {
       const stateType = state$.value.bedroomOneReducer.doubleClickState.type
       const colorPackage = (stateType === 'color-light')
         ? { color: { hex: state$.value.bedroomOneReducer.doubleClickState.values.color } }
@@ -44,7 +40,7 @@ const buttonClickEpic = (
       )
     }
 
-    if (currentRoomSetup === ButtonState.Single) {
+    if (currentRoomSetup === ROOM_STATE_SINGLE) {
       const stateType = state$.value.bedroomOneReducer.singleClickState.type
       const colorPackage = (stateType === 'color-light')
         ? { color: { hex: state$.value.bedroomOneReducer.singleClickState.values.color } }

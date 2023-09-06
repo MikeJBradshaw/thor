@@ -21,6 +21,10 @@ import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this nami
 import {
   BEDROOM_ONE,
   BUTTON,
+  BUTTON_STATE_DOUBLE,
+  BUTTON_STATE_HOLD,
+  BUTTON_STATE_RELEASE,
+  BUTTON_STATE_SINGLE,
   CHICKEN_COOP,
   LAUNDRY,
   MASTER_BATH,
@@ -29,7 +33,8 @@ import {
   TEMP_HUMIDITY,
   TEST
 } from 'consts'
-import { ButtonState } from 'payloads'
+import {
+} from 'payloads'
 import routes from 'routes'
 import store from 'store'
 
@@ -59,14 +64,14 @@ export const bedroomOneRouter = (device: string, buffer: Buffer): void => {
   const data = JSON.parse(buffer.toString())
   if (device === BUTTON) {
     switch (data.action) {
-      case ButtonState.Single:
-      case ButtonState.Double:
+      case BUTTON_STATE_SINGLE:
+      case BUTTON_STATE_DOUBLE:
         store.dispatch(bedroomOneButtonClick(data))
         return
-      case ButtonState.Hold:
+      case BUTTON_STATE_HOLD:
         store.dispatch(bedroomOneButtonHold(data))
         return
-      case ButtonState.Release:
+      case BUTTON_STATE_RELEASE:
         store.dispatch(bedroomOneButtonRelease(data))
     }
   }
@@ -89,14 +94,14 @@ export const masterBathRouter = (device: string, buffer: Buffer): void => {
 
   if (device === BUTTON) {
     switch (data.action) {
-      case ButtonState.Single:
-      case ButtonState.Double:
+      case BUTTON_STATE_SINGLE:
+      case BUTTON_STATE_DOUBLE:
         store.dispatch(masterBathButtonClick(data))
         return
-      case ButtonState.Hold:
+      case BUTTON_STATE_HOLD:
         store.dispatch(masterBathButtonHold(data))
         return
-      case ButtonState.Release:
+      case BUTTON_STATE_RELEASE:
         store.dispatch(masterBathButtonRelease(data))
     }
   }
