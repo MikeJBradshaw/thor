@@ -48,7 +48,7 @@ client.on('connect', () => {
       const data = JSON.parse(buffer.toString())
 
       switch (entity) {
-        case 'lola':
+        case 'bedroom_1':
 
           switch (data.action) {
             case 'hold':
