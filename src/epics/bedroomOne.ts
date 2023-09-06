@@ -3,7 +3,7 @@ import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
-  BEDROOM_ONE_LIGHTS,
+  BEDROOM_ONE_LIGHTS_GROUP,
   BEDROOM_ONE_POWER_ONE,
   BUTTON_CLICK
 } from 'actions/bedroomOne'
@@ -34,14 +34,7 @@ const buttonClickEpic = (
 
       return of(
         lightOnPublish(
-          BEDROOM_ONE_LIGHTS[0],
-          {
-            brightness: state$.value.bedroomOneReducer.doubleClickState.values.brightness,
-            ...colorPackage
-          }
-        ),
-        lightOnPublish(
-          BEDROOM_ONE_LIGHTS[1],
+          BEDROOM_ONE_LIGHTS_GROUP,
           {
             brightness: state$.value.bedroomOneReducer.doubleClickState.values.brightness,
             ...colorPackage
@@ -59,14 +52,7 @@ const buttonClickEpic = (
 
       return of(
         lightOnPublish(
-          BEDROOM_ONE_LIGHTS[0],
-          {
-            brightness: state$.value.bedroomOneReducer.singleClickState.values.brightness,
-            ...colorPackage
-          }
-        ),
-        lightOnPublish(
-          BEDROOM_ONE_LIGHTS[1],
+          BEDROOM_ONE_LIGHTS_GROUP,
           {
             brightness: state$.value.bedroomOneReducer.singleClickState.values.brightness,
             ...colorPackage
@@ -83,8 +69,7 @@ const buttonClickEpic = (
     const brightness = state$.value.bedroomOneReducer.defaultState.values.brightness
 
     return of(
-      lightOnPublish(BEDROOM_ONE_LIGHTS[0], { brightness, ...colorPackage }),
-      lightOnPublish(BEDROOM_ONE_LIGHTS[1], { brightness, ...colorPackage }),
+      lightOnPublish(BEDROOM_ONE_LIGHTS_GROUP, { brightness, ...colorPackage }),
       powerOff(BEDROOM_ONE_POWER_ONE, { state: 'OFF', power_on_behavior: 'on' })
     )
   })

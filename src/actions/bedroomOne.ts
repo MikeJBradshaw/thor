@@ -1,9 +1,11 @@
 import { ButtonState } from 'payloads'
 
-export const BEDROOM_ONE_LIGHTS = [
-  'z2m/home/lola/light/light_1',
-  'z2m/home/lola/light/light_2'
-]
+/***************
+ * DEVICES
+ * ************/
+export const BEDROOM_ONE_LIGHTS_GROUP = 'z2m/bedroom_1_lights'
+export const BEDROOM_ONE_LIGHT_1 = 'z2m/home/bedroom_1/light/light_1'
+export const BEDROOM_ONE_LIGHT_2 = 'z2m/home/bedroom_1/light/light_2'
 
 export const BEDROOM_ONE_POWER_ONE = 'z2m/home/lola/power/sound_machine'
 
