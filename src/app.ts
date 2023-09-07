@@ -12,6 +12,12 @@ import {
 } from 'actions/bedroomOne' // TODO: fix this naming
 import { motionSensor } from 'actions/laundry' // TODO: fix this naming
 import {
+  guestBathButtonClick,
+  guestBathButtonHold,
+  guestBathButtonRelease,
+  guestBathMotionSensor
+} from 'actions/guestBath'
+import {
   masterBathButtonClick,
   masterBathButtonHold,
   masterBathButtonRelease,
@@ -26,6 +32,7 @@ import {
   BUTTON_STATE_RELEASE,
   BUTTON_STATE_SINGLE,
   CHICKEN_COOP,
+  GUEST_BATH,
   LAUNDRY,
   MASTER_BATH,
   MOTION_SENSOR,
@@ -60,6 +67,29 @@ console.log('LOG_PUBLISH:      ', LOG_PUBLISH)
 console.log('CONNECTION_STRING:', CONNECTION_STRING)
 console.log('###########################################################')
 
+export const guestBathRouter = (device: string, buffer: Buffer): void => {
+  const data = JSON.parse(buffer.toString())
+  if (device === BUTTON) {
+    switch (data.action) {
+      case BUTTON_STATE_SINGLE:
+      case BUTTON_STATE_DOUBLE:
+        store.dispatch(guestBathButtonClick(data))
+        return
+
+      case BUTTON_STATE_HOLD:
+        store.dispatch(guestBathButtonHold(data))
+        return
+
+      case BUTTON_STATE_RELEASE:
+        store.dispatch(guestBathButtonRelease(data))
+    }
+  }
+
+  if (device === MOTION_SENSOR) {
+    store.dispatch(guestBathMotionSensor(data))
+  }
+}
+
 export const bedroomOneRouter = (device: string, buffer: Buffer): void => {
   const data = JSON.parse(buffer.toString())
   if (device === BUTTON) {
@@ -68,9 +98,11 @@ export const bedroomOneRouter = (device: string, buffer: Buffer): void => {
       case BUTTON_STATE_DOUBLE:
         store.dispatch(bedroomOneButtonClick(data))
         return
+
       case BUTTON_STATE_HOLD:
         store.dispatch(bedroomOneButtonHold(data))
         return
+
       case BUTTON_STATE_RELEASE:
         store.dispatch(bedroomOneButtonRelease(data))
     }
@@ -98,9 +130,11 @@ export const masterBathRouter = (device: string, buffer: Buffer): void => {
       case BUTTON_STATE_DOUBLE:
         store.dispatch(masterBathButtonClick(data))
         return
+
       case BUTTON_STATE_HOLD:
         store.dispatch(masterBathButtonHold(data))
         return
+
       case BUTTON_STATE_RELEASE:
         store.dispatch(masterBathButtonRelease(data))
     }
@@ -127,6 +161,10 @@ client.on('connect', () => {
 
         case CHICKEN_COOP:
           chickenCoopRouter(device, buffer)
+          break
+
+        case GUEST_BATH:
+          guestBathRouter(device, buffer)
           break
 
         case LAUNDRY:
