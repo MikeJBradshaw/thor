@@ -91,10 +91,7 @@ const buttonHoldEpic = (
   ofType(BEDROOM_ONE_BUTTON_HOLD),
   switchMap(() => interval(500).pipe(
     map((val: number) => {
-      if (val % 2 === 0) {
-        return lightOnPublish(BEDROOM_ONE_LIGHT_1, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
-      }
-      return lightOnPublish(BEDROOM_ONE_LIGHT_2, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
+      return lightOnPublish(BEDROOM_ONE_LIGHTS_GROUP, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
     }),
     takeUntil(action$.pipe(ofType(BEDROOM_ONE_BUTTON_RELEASE)))
   ))
