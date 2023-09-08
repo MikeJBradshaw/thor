@@ -1,4 +1,4 @@
-import { Observable, of, timer } from 'rxjs'
+import { Observable, of, interval } from 'rxjs'
 import { switchMap, takeUntil, map } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
@@ -83,22 +83,24 @@ const buttonClickEpic = (
   })
 )
 
+// TODO: not working correctly
 type ButtonHoldEpicReturnType = Observable<LightOnPublish>
 const buttonHoldEpic = (
   action$: Observable<BedroomOneButtonHoldAction | BedroomOneButtonReleaseAction>
 ): ButtonHoldEpicReturnType => action$.pipe(
   ofType(BEDROOM_ONE_BUTTON_HOLD),
-  switchMap(() => timer(250).pipe(
+  switchMap(() => interval(500).pipe(
     map((val: number) => {
       if (val % 2 === 0) {
         return lightOnPublish(BEDROOM_ONE_LIGHT_1, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
       }
       return lightOnPublish(BEDROOM_ONE_LIGHT_2, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
     }),
-    takeUntil(BEDROOM_ONE_BUTTON_RELEASE)
+    takeUntil(action$.pipe(ofType(BEDROOM_ONE_BUTTON_RELEASE)))
   ))
 )
 
+// TODO: not working correctly
 type ButtonReleaseEpicReturnType = Observable<LightOnPublish | PowerOn | PowerOff>
 export const buttonReleaseEpic = (
   action$: Observable<BedroomOneButtonReleaseAction>,
@@ -156,4 +158,8 @@ export const buttonReleaseEpic = (
   })
 )
 
-export default combineEpics(buttonClickEpic as any, buttonHoldEpic as any, buttonReleaseEpic as any)
+export default combineEpics(
+  buttonClickEpic as any,
+  buttonHoldEpic as any,
+  buttonReleaseEpic as any
+)
