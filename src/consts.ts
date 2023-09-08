@@ -30,3 +30,24 @@ export const BUTTON_STATE_RELEASE = 'release'
 export const ROOM_STATE_DEFAULT = 'default'
 export const ROOM_STATE_SINGLE = 'single'
 export const ROOM_STATE_DOUBLE = 'double'
+
+/*****************************
+ * random
+ * **************************/
+export const COLOR_RED_HEX = '#FF0000'
+export const COLOR_ORANGE_HEX = '#FFA500'
+export const COLOR_YELLOW_HEX = '#FFFF00'
+export const COLOR_GREEN_HEX = '#008000'
+export const COLOR_BLUE_HEX = '#0000FF'
+export const COLOR_INDIGO_HEX = '#4B0082'
+export const COLOR_VIOLET_HEX = '#7F00FF'
+
+export const RAINBOW_COLORS = [
+  COLOR_RED_HEX,
+  COLOR_ORANGE_HEX,
+  COLOR_YELLOW_HEX,
+  COLOR_GREEN_HEX,
+  COLOR_BLUE_HEX,
+  COLOR_INDIGO_HEX,
+  COLOR_VIOLET_HEX
+]
