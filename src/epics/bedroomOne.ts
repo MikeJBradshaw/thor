@@ -88,14 +88,14 @@ const buttonHoldEpic = (
   action$: Observable<BedroomOneButtonHoldAction | BedroomOneButtonReleaseAction>
 ): ButtonHoldEpicReturnType => action$.pipe(
   ofType(BEDROOM_ONE_BUTTON_HOLD),
-  switchMap(() => timer(0, 250).pipe(
-    takeUntil(BEDROOM_ONE_BUTTON_RELEASE),
+  switchMap(() => timer(250).pipe(
     map((val: number) => {
       if (val % 2 === 0) {
         return lightOnPublish(BEDROOM_ONE_LIGHT_1, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
       }
       return lightOnPublish(BEDROOM_ONE_LIGHT_2, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
-    })
+    }),
+    takeUntil(BEDROOM_ONE_BUTTON_RELEASE)
   ))
 )
 
@@ -156,4 +156,4 @@ export const buttonReleaseEpic = (
   })
 )
 
-export default combineEpics(buttonClickEpic as any, buttonHoldEpic as any)
+export default combineEpics(buttonClickEpic as any, buttonHoldEpic as any, buttonReleaseEpic as any)
