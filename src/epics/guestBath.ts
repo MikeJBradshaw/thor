@@ -1,5 +1,5 @@
-import { Observable, of } from 'rxjs'
-import { switchMap } from 'rxjs/operators'
+import { Observable, of, interval } from 'rxjs'
+import { switchMap, takeUntil, map } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
@@ -10,7 +10,7 @@ import {
   GUEST_BATH_MOTION_SENSOR
 } from 'actions/guestBath'
 import { lightOnPublish, noop } from 'actions/mqttClient'
-import { ROOM_STATE_DEFAULT, ROOM_STATE_SINGLE } from 'consts'
+import { ROOM_STATE_DEFAULT, ROOM_STATE_DOUBLE, ROOM_STATE_SINGLE, RAINBOW_COLORS, COLOR_RED_HEX } from 'consts'
 import type { RootState } from 'store'
 import type {
   GuestBathButtonClickAction,
@@ -23,7 +23,6 @@ import type { LightOnPublish, Noop } from 'actions/mqttClient'
 const BRIGHTNESS_HIGH = 255
 const BRIGHTNESS_LOW = 15
 const BRIGHTNESS_OFF = 0
-const RED = '#FF0000'
 const DAY_END = '20:30:00'
 const DAY_START = '06:45:00'
 
@@ -46,7 +45,9 @@ const motionSensorEpic = (
         const date = new Date().toLocaleTimeString('en', { hour12: false })
 
         if (isNight(date)) {
-          return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: RED } }))
+          return of(
+            lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } })
+          )
         }
 
         return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
@@ -76,7 +77,7 @@ const buttonReleaseEpic = (
     const date = new Date().toLocaleTimeString('en', { hour12: false })
 
     if (isNight(date)) {
-      return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: RED } }))
+      return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }))
     }
 
     return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
@@ -85,7 +86,7 @@ const buttonReleaseEpic = (
 
 type ButtonClickEpicReturnType = Observable<LightOnPublish | Noop>
 const buttonClickEpic = (
-  action$: Observable<GuestBathButtonClickAction>,
+  action$: Observable<GuestBathButtonClickAction | GuestBathButtonHoldAction>,
   state$: StateObservable<RootState>
 ): ButtonClickEpicReturnType => action$.pipe(
   ofType(GUEST_BATH_BUTTON_CLICK),
@@ -95,11 +96,27 @@ const buttonClickEpic = (
       return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
     }
 
+    if (buttonAction === ROOM_STATE_DOUBLE) {
+      return interval(1250).pipe(
+        switchMap(val => of(lightOnPublish(
+          GUEST_BATH_LIGHTS_GROUP,
+          {
+            brightness: 255,
+            color: { hex: RAINBOW_COLORS[val % 7] },
+            transition: 1
+          }
+        ))),
+        takeUntil(action$.pipe(ofType(GUEST_BATH_BUTTON_CLICK, GUEST_BATH_BUTTON_HOLD)))
+      )
+    }
+
     if (buttonAction === ROOM_STATE_DEFAULT) { // TODO: need to add room state
       const date = new Date().toLocaleTimeString('en', { hour12: false })
 
       if (isNight(date)) {
-        return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: RED } }))
+        return of(
+          lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } })
+        )
       }
 
       return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))

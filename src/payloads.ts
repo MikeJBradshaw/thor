@@ -37,7 +37,8 @@ interface Color {
 export interface LightPayload {
   brightness: number
   color?: Color
-  color_temp?: 'warmest' | 'warm' | 'neutral' | 'cool' | 'coolest'
+  color_temp?: 'warmest' | 'warm' | 'neutral' | 'cool' | 'coolest',
+  transition?: number
 }
 
 export interface PowerPayload {
