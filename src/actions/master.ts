@@ -28,7 +28,17 @@ export const masterBathMotionSensor = (
   payload: MotionSensorPayload
 ): MasterBathMotionSensorAction => ({ type: MASTER_BATH_MOTION_SENSOR, payload })
 
+export const MASTER_BATH_TIMER = 'MASTER_BATH_TIMER'
+export interface MasterBathTimerAction { type: typeof MASTER_BATH_TIMER }
+export const masterBathTimer = (): MasterBathTimerAction => ({ type: MASTER_BATH_TIMER })
+
+export const MASTER_BATH_TIMER_EXPIRE = 'MASTER_BATH_TIMER_EXPIRE'
+export interface MasterBathTimerExpireAction { type: typeof MASTER_BATH_TIMER_EXPIRE }
+export const masterBathTimerExpire = (): MasterBathTimerExpireAction => ({ type: MASTER_BATH_TIMER_EXPIRE })
+
 export type MasterAction = MasterBathButtonClickAction
 | MasterBathButtonHoldAction
 | MasterBathButtonReleaseAction
 | MasterBathMotionSensorAction
+| MasterBathTimerAction
+| MasterBathTimerExpireAction

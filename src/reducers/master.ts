@@ -7,8 +7,9 @@ import {
   MASTER_BATH_MOTION_SENSOR
 } from 'actions/master'
 import {
+  BUTTON_STATE_DOUBLE,
   ROOM_STATE_DEFAULT,
-  ROOM_STATE_DOUBLE
+  ROOM_STATE_SINGLE
 } from 'consts'
 import type { MasterAction } from 'actions/master'
 import type { ButtonPayload, MotionSensorPayload } from 'payloads'
@@ -16,6 +17,7 @@ import type { ButtonPayload, MotionSensorPayload } from 'payloads'
 interface MasterState {
   overrideMasterBathLights: boolean
   overrideMasterBathMotionSensor: boolean
+  roomState: string
   motionSensorState: MotionSensorPayload
   buttonState: ButtonPayload
 }
@@ -23,6 +25,7 @@ interface MasterState {
 const initState: MasterState = {
   overrideMasterBathLights: false,
   overrideMasterBathMotionSensor: false,
+  roomState: ROOM_STATE_DEFAULT,
   motionSensorState: {
     battery: -1,
     batteryLow: false,
@@ -38,30 +41,29 @@ const initState: MasterState = {
 const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, action) => {
   switch (action.type) {
     case MASTER_BATH_BUTTON_CLICK: {
-      const oldAction = state.buttonState.action
+      const roomState = state.roomState
       const buttonAction = action.payload.action
 
-      // want to set default IFF we are currently not in default mode AND old and new actions agree
-      if (oldAction !== ROOM_STATE_DEFAULT && oldAction === buttonAction) {
-        return {
-          ...state,
-          overrideMasterBathMotionSensor: false,
-          buttonState: {
-            ...state.buttonState,
-            ...action.payload,
-            action: ROOM_STATE_DEFAULT
-          }
-        }
-      }
-
       // double click not supported
-      if (buttonAction === ROOM_STATE_DOUBLE) {
+      if (buttonAction === BUTTON_STATE_DOUBLE) {
         return state
       }
 
+      // button click single and room state already single -> default
+      if (roomState === ROOM_STATE_SINGLE) {
+        return {
+          ...state,
+          overrideMasterBathMotionSensor: false,
+          roomState: ROOM_STATE_DEFAULT,
+          buttonState: action.payload
+        }
+      }
+
+      // button click single and room state default -> single
       return {
         ...state,
         overrideMasterBathMotionSensor: true,
+        roomState: ROOM_STATE_SINGLE,
         buttonState: action.payload
       }
     }

@@ -92,7 +92,7 @@ const buttonClickEpic = (
   ofType(GUEST_BATH_BUTTON_CLICK),
   switchMap(() => {
     const buttonAction = state$.value.guestBathReducer.buttonState.action
-    if (buttonAction === ROOM_STATE_SINGLE) { // TODO: need to add room state
+    if (buttonAction === ROOM_STATE_SINGLE) {
       return of(lightOnPublish(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: 'neutral' }))
     }
 
@@ -110,7 +110,7 @@ const buttonClickEpic = (
       )
     }
 
-    if (buttonAction === ROOM_STATE_DEFAULT) { // TODO: need to add room state
+    if (buttonAction === ROOM_STATE_DEFAULT) {
       const date = new Date().toLocaleTimeString('en', { hour12: false })
 
       if (isNight(date)) {

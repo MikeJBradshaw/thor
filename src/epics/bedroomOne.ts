@@ -89,7 +89,7 @@ const buttonHoldEpic = (
   action$: Observable<BedroomOneButtonHoldAction | BedroomOneButtonReleaseAction>
 ): ButtonHoldEpicReturnType => action$.pipe(
   ofType(BEDROOM_ONE_BUTTON_HOLD),
-  switchMap(() => interval(500).pipe(
+  switchMap(() => interval(1000).pipe(
     map((val: number) => {
       return lightOnPublish(BEDROOM_ONE_LIGHTS_GROUP, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
     }),

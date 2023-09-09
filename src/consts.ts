@@ -32,8 +32,17 @@ export const ROOM_STATE_SINGLE = 'single'
 export const ROOM_STATE_DOUBLE = 'double'
 
 /*****************************
- * random
+ * light colors
  * **************************/
+export const BRIGHTNESS_HIGH = 255
+export const BRIGHTNESS_LOW = 15
+export const BRIGHTNESS_OFF = 0
+
+export const COLOR_TEMP_COOLEST = 'coolest'
+export const COLOR_TEMP_COOL = 'cool'
+export const COLOR_TEMP_NEUTRAL = 'neutral'
+export const COLOR_TEMP_WARM = 'warm'
+export const COLOR_TEMP_WARMEST = 'warmest'
 export const COLOR_RED_HEX = '#FF0000'
 export const COLOR_ORANGE_HEX = '#FFA500'
 export const COLOR_YELLOW_HEX = '#FFFF00'
