@@ -9,7 +9,7 @@ import {
   bedroomOneButtonClick,
   bedroomOneButtonHold,
   bedroomOneButtonRelease
-} from 'actions/bedroomOne' // TODO: fix this naming
+} from 'actions/bedroomOne'
 import { motionSensor } from 'actions/laundry' // TODO: fix this naming
 import {
   guestBathButtonClick,
@@ -24,6 +24,7 @@ import {
   masterBathMotionSensor
 } from 'actions/master'
 import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
+import { supervisorInit } from 'actions/supervisor'
 import {
   BEDROOM_ONE,
   BUTTON,
@@ -44,6 +45,10 @@ import {
 } from 'payloads'
 import routes from 'routes'
 import store from 'store'
+
+// import AbortController from 'abort-controller'
+
+global.fetch = fetch
 
 /**************
  * ZIBGEE
@@ -141,11 +146,18 @@ export const masterBathRouter = (device: string, buffer: Buffer): void => {
   }
 }
 
+let previousConnection = false
+
 const client: MqttClient = connect(CONNECTION_STRING)
 client.on('connect', () => {
   console.log('SUBSCRIPTION CLIENT connected...')
 
-  client.subscribe('z2m/home/#', err => {
+  if (!previousConnection) {
+    store.dispatch(supervisorInit())
+    previousConnection = true
+  }
+
+  client.subscribe('z2m/source/#', err => {
     if (err !== null) {
       console.error(`testing subscription error ${err.message}`)
       // observer.error(err) // TODO: handle this error
@@ -180,6 +192,14 @@ client.on('connect', () => {
       }
     })
   })
+})
+
+client.on('disconnect', () => {
+  console.log('MQTT client disconnected')
+})
+
+client.on('reconnect', () => {
+  console.log('MQTT client reconnected')
 })
 
 console.log('SUBSCRIPTION TO ZIGBEE PIPE')

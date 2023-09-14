@@ -1,8 +1,8 @@
 import type { MotionSensorPayload } from 'payloads'
 
 export const LAUNDRY_LIGHTS = [
-  'z2m/home/laundry/light/light_1',
-  'z2m/home/laundry/light/light_2'
+  'z2m/sink/laundry/light/light_1',
+  'z2m/sink/laundry/light/light_2'
 ]
 
 export const MOTION_SENSOR = 'LAUNDRY_MOTION_SENSOR'

@@ -6,11 +6,13 @@ import laundryReducer from 'reducers/laundry'
 import masterReducer from 'reducers/master'
 import chickenCoopReducer from 'reducers/chickenCoop'
 import guestBathReducer from 'reducers/guestBath'
+import supervisorReducer from 'reducers/supervisor'
 import bedroomOneEpic from 'epics/bedroomOne'
 import laundryEpic from 'epics/laundry'
 import masterEpic from 'epics/master'
 import chickenCoopEpic from 'epics/chickenCoop'
 import guestBathEpic from 'epics/guestBath'
+import supervisorEpic from 'epics/supervisor'
 
 const reducers = combineReducers({
   bedroomOneReducer,
@@ -18,7 +20,8 @@ const reducers = combineReducers({
   guestBathReducer,
   laundryReducer,
   mqttPublishClientReducer,
-  masterReducer
+  masterReducer,
+  supervisorReducer
 })
 const epicMiddleware = createEpicMiddleware()
 
@@ -29,7 +32,8 @@ epicMiddleware.run(
     chickenCoopEpic,
     guestBathEpic,
     laundryEpic,
-    masterEpic
+    masterEpic,
+    supervisorEpic
   )
 )
 
