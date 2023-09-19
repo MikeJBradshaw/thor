@@ -225,3 +225,9 @@ const server = createServer({
 const main: IO<void> = async () => await (await server)()
 
 main()
+
+process.on('SIGINT', () => {
+  console.log('CAUGHT SHUTDOWN SIGNAL, SHUTTING DOWN...')
+  // future messaging that its going down
+  process.exit()
+})

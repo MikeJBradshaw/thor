@@ -38,6 +38,17 @@ export const PRODUCTION = 'production'
 export const TEST = 'test'
 
 /*****************************
+* time
+* ***************************/
+export const HOURS_24 = 86400000
+export const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 5
+
+/*****************************
+* external APIs
+*****************************/
+export const SUNRISE_SUNSET_API = 'https://api.sunrise-sunset.org'
+
+/*****************************
  * general
  * **************************/
 export const BUTTON_STATE_SINGLE = 'single'
