@@ -1,6 +1,6 @@
 import { ofType, combineEpics } from 'redux-observable'
-import { Observable, interval, of } from 'rxjs'
-import { catchError, switchMap } from 'rxjs/operators'
+import { Observable, interval, of, timer, concat } from 'rxjs'
+import { catchError, map, switchMap, tap } from 'rxjs/operators'
 import { fromFetch } from 'rxjs/fetch'
 import type { StateObservable } from 'redux-observable'
 
@@ -9,19 +9,22 @@ import {
   SUPERVISOR_NETWORK_ERROR,
   supervisorError,
   supervisorNetworkCheck,
-  supervisorNetworkError
+  supervisorNetworkError,
+  supervisorSetSunriseSunset
 } from 'actions/supervisor'
 import { powerOn, powerOff, noop } from 'actions/mqttClient'
 import type {
   SupervisorErrorAction,
   SupervisorInitAction,
   SupervisorNetworkCheckAction,
-  SupervisorNetworkErrorAction
+  SupervisorNetworkErrorAction,
+  SupervisorSetSunriseSunsetAction
 } from 'actions/supervisor'
+import { deltaToMidnight } from 'helpers/helpers'
+import { HOURS_24, NETWORK_NO_RESPONSE_TIMEOUT, SUNRISE_SUNSET_API } from 'consts'
 import type { PowerOff, PowerOn, Noop } from 'actions/mqttClient'
+import type { SunriseSunsetResponse } from 'types/responses'
 import type { RootState } from 'store'
-
-const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 5
 
 type NetworkCheckEpicReturnType = Observable<SupervisorNetworkCheckAction | SupervisorErrorAction | SupervisorNetworkErrorAction>
 const networkCheckEpic = (
@@ -57,12 +60,54 @@ const networkErrorEpic = (
     const lastNetworkUpdate: Date = state$.value.supervisorReducer.lastSuccessfulInternetCheck
 
     if (+currentTime - +lastNetworkUpdate > NETWORK_NO_RESPONSE_TIMEOUT) {
-      console.log('network response timeout')
       return of(noop())
     }
-    console.log('not network reponse timeout')
     return of(noop())
   })
 )
 
-export default combineEpics(networkCheckEpic as any, networkErrorEpic as any)
+/**
+ * Queries sunrise-sunset API to determine when to send main light information
+ *
+ * @remarks This will query upon start, the delta to midnight, then every midnight after
+ */
+type SunriseSunsetEpicResponseType = Observable<SupervisorSetSunriseSunsetAction | SupervisorErrorAction>
+export const sunriseSunsetEpic = (
+  action$: Observable<SupervisorInitAction>
+): SunriseSunsetEpicResponseType => action$.pipe(
+  ofType(SUPERVISOR_INIT),
+  switchMap(() => fromFetch(
+    `${SUNRISE_SUNSET_API}/json?lat=39.1097&lng=-95.0877&date=today&formatted=0`,
+    { selector: async (res) => await res.json() }
+  ).pipe(
+    switchMap(({ status, results }: SunriseSunsetResponse) => concat(
+      of(supervisorSetSunriseSunset(
+        {
+          sunrise: results.sunrise,
+          sunset: results.sunset,
+          solarNoon: results.solar_noon,
+          civilTwilightEnd: results.civil_twilight_end,
+          civilTwilightBegin: results.civil_twilight_begin
+        }
+      )),
+      timer(deltaToMidnight(), HOURS_24).pipe(
+        switchMap(() => fromFetch(
+          `${SUNRISE_SUNSET_API}/json?lat=39.1097&lng=-95.0877&date=today&formatted=0`,
+          { selector: async (res) => await res.json() }
+        ).pipe(
+          map(({ status, results }: SunriseSunsetResponse) => supervisorSetSunriseSunset(
+            {
+              sunrise: results.sunrise,
+              sunset: results.sunset,
+              solarNoon: results.solar_noon,
+              civilTwilightEnd: results.civil_twilight_end,
+              civilTwilightBegin: results.civil_twilight_begin
+            }
+          ))
+        ))
+      )
+    ))
+  ))
+)
+
+export default combineEpics(networkCheckEpic as any, networkErrorEpic as any, sunriseSunsetEpic as any)

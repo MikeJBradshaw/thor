@@ -1,4 +1,4 @@
-import type { SoilMoistureAndTemperaturePayload } from 'payloads'
+import type { SoilMoistureAndTemperaturePayload } from 'types/payloads'
 
 export const BED_TWO_SOIL_MOISTURE_TEMPERATURE = 'BED_TWO_SOIL_MOISTURE_TEMPERATURE'
 export interface BedTwoSoilMoistureTemperatureAction {

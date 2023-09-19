@@ -1,6 +1,6 @@
 import type { Reducer } from 'redux'
 
-import type { SoilMoistureAndTemperaturePayload } from 'payloads'
+import type { SoilMoistureAndTemperaturePayload } from 'types/payloads'
 import type { GardenBedAction } from 'actions/gardenBeds'
 
 interface GardenBedsState {

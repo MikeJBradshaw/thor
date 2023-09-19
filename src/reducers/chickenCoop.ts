@@ -2,7 +2,7 @@ import type { Reducer } from 'redux'
 
 import { TEMPERATURE_HUMIDITY } from 'actions/chickenCoop'
 import type { ChickenCoopAction } from 'actions/chickenCoop'
-import type { TemperatureAndHumdityPayload } from 'payloads'
+import type { TemperatureAndHumdityPayload } from 'types/payloads'
 
 interface ChickenCoopState {
   tempHumidityState: TemperatureAndHumdityPayload

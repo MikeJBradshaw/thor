@@ -37,11 +37,19 @@ interface Color {
 export interface LightPayload {
   brightness: number
   color?: Color
-  color_temp?: 'warmest' | 'warm' | 'neutral' | 'cool' | 'coolest',
+  color_temp?: 'warmest' | 'warm' | 'neutral' | 'cool' | 'coolest'
   transition?: number
 }
 
 export interface PowerPayload {
   state: 'ON' | 'OFF'
   power_on_behavior?: 'off' | 'on' | 'toggle'
+}
+
+export interface SunData {
+  sunrise: string
+  sunset: string
+  solarNoon: string
+  civilTwilightBegin: string
+  civilTwilightEnd: string
 }

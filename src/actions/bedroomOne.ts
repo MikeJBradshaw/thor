@@ -1,4 +1,4 @@
-import { ButtonPayload } from 'payloads'
+import { ButtonPayload } from 'types/payloads'
 
 /***************
  * DEVICES

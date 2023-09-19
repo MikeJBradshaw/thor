@@ -11,7 +11,7 @@ import {
   ROOM_STATE_DOUBLE
 } from 'consts'
 import type { GuestBathAction } from 'actions/guestBath'
-import type { ButtonPayload, MotionSensorPayload } from 'payloads'
+import type { ButtonPayload, MotionSensorPayload } from 'types/payloads'
 
 interface GuestBathState {
   overrideGuestBathLights: boolean

@@ -12,7 +12,7 @@ import {
   ROOM_STATE_SINGLE
 } from 'consts'
 import type { MasterAction } from 'actions/master'
-import type { ButtonPayload, MotionSensorPayload } from 'payloads'
+import type { ButtonPayload, MotionSensorPayload } from 'types/payloads'
 
 interface MasterState {
   overrideMasterBathLights: boolean

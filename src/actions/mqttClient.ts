@@ -1,4 +1,4 @@
-import type { Action, LightPayload, PowerPayload } from 'payloads'
+import type { Action, LightPayload, PowerPayload } from 'types/payloads'
 
 export const LIGHT_ON_PUBLISH = 'CLIENT_LIGHT_ON'
 export interface LightOnPublish extends Action { type: typeof LIGHT_ON_PUBLISH, payload: LightPayload }

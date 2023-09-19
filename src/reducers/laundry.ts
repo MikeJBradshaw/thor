@@ -2,7 +2,7 @@ import type { Reducer } from 'redux'
 
 import { MOTION_SENSOR } from 'actions/laundry'
 import type { LaundryAction } from 'actions/laundry'
-import type { MotionSensorPayload } from 'payloads'
+import type { MotionSensorPayload } from 'types/payloads'
 
 interface LaundryState {
   overrideLights: boolean

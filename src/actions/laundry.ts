@@ -1,4 +1,4 @@
-import type { MotionSensorPayload } from 'payloads'
+import type { MotionSensorPayload } from 'types/payloads'
 
 export const LAUNDRY_LIGHTS = [
   'z2m/sink/laundry/light/light_1',

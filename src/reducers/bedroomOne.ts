@@ -1,7 +1,7 @@
 import type { Reducer } from 'redux'
 
 import { BEDROOM_ONE_BUTTON_CLICK, BEDROOM_ONE_BUTTON_HOLD, BEDROOM_ONE_BUTTON_RELEASE } from 'actions/bedroomOne'
-import { ButtonPayload } from 'payloads'
+import { ButtonPayload } from 'types/payloads'
 import {
   BUTTON_STATE_DOUBLE,
   BUTTON_STATE_HOLD,

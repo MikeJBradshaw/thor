@@ -42,7 +42,7 @@ import {
   TEST
 } from 'consts'
 import {
-} from 'payloads'
+} from 'types/payloads'
 import routes from 'routes'
 import store from 'store'
 

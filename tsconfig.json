@@ -12,12 +12,12 @@
     /* "noImplicitAny": true, */
     "resolveJsonModule": true,
     "strictNullChecks": true,
-    /* "moduleResolution": "node16", */
+    "moduleResolution": "node16",
     /* "outDir": "dist", */
     "skipLibCheck": true,
     /* "strictNullChecks": true, */
     /* "sourceMap": true, */
     "strict": true,
-    "target": "es2016"
+    "target": "es2017"
   }
 }

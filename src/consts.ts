@@ -2,11 +2,29 @@
  * app - routing
  * *****************************/
 // entities
+export const BED_TWO = 'bed_2'
+export const BED_FOUR = 'bed_4'
+export const BED_FIVE = 'bed_5'
 export const BEDROOM_ONE = 'bedroom_1'
 export const CHICKEN_COOP = 'chicken_coop'
 export const GUEST_BATH = 'guest_bath'
+export const KITCHEN = 'kitchen'
 export const LAUNDRY = 'laundry'
+export const LIVING_ROOM = 'living_room'
 export const MASTER_BATH = 'master_bath'
+
+export const ENTITIES = [
+  BED_TWO,
+  BED_FOUR,
+  BED_FIVE,
+  BEDROOM_ONE,
+  CHICKEN_COOP,
+  GUEST_BATH,
+  KITCHEN,
+  LAUNDRY,
+  LIVING_ROOM,
+  MASTER_BATH
+]
 
 // devices
 export const BUTTON = 'button'

@@ -1,4 +1,4 @@
-import type { ButtonPayload, MotionSensorPayload } from 'payloads'
+import type { ButtonPayload, MotionSensorPayload } from 'types/payloads'
 
 export const LIGHTS_GROUP = 'z2m/master_bath_lights'
 export const MASTER_BATH_LIGHT_1 = 'z2m/sink/master_bath/light/light_1'
