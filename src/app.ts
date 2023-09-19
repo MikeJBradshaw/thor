@@ -23,6 +23,9 @@ import {
   masterBathButtonRelease,
   masterBathMotionSensor
 } from 'actions/master'
+import {
+  livingRoomButtonClick
+} from 'actions/livingRoom'
 import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
 import { supervisorInit } from 'actions/supervisor'
 import {
@@ -35,6 +38,7 @@ import {
   CHICKEN_COOP,
   GUEST_BATH,
   LAUNDRY,
+  LIVING_ROOM,
   MASTER_BATH,
   MOTION_SENSOR,
   PRODUCTION,
@@ -122,6 +126,18 @@ export const laundryRouter = (device: string, buffer: Buffer): void => {
   if (device === MOTION_SENSOR) { store.dispatch(motionSensor(JSON.parse(buffer.toString()))) }
 }
 
+const livingRoomRouter = (device: string, buffer: Buffer): void => {
+  const data = JSON.parse(buffer.toString())
+
+  if (device === BUTTON) {
+    switch (data.action) {
+      case BUTTON_STATE_SINGLE:
+      case BUTTON_STATE_DOUBLE:
+        store.dispatch(livingRoomButtonClick(data))
+    }
+  }
+}
+
 export const masterBathRouter = (device: string, buffer: Buffer): void => {
   const data = JSON.parse(buffer.toString())
   if (device === MOTION_SENSOR) {
@@ -181,6 +197,10 @@ client.on('connect', () => {
 
         case LAUNDRY:
           laundryRouter(device, buffer)
+          break
+
+        case LIVING_ROOM:
+          livingRoomRouter(device, buffer)
           break
 
         case MASTER_BATH:

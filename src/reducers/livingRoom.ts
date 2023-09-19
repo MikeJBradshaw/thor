@@ -24,7 +24,9 @@ const livingRoomReducer: Reducer<LivingRoomState, LivingRoomAction> = (state = i
       return {
         ...state,
         buttonState: action.payload,
-        overrideLivingRoomLights: (action.payload.action === 'single' || action.payload.action === 'double')
+        overrideLivingRoomLights: (
+          action.payload.action === 'single' || action.payload.action === 'double'
+        ) && !state.overrideLivingRoomLights
       }
     }
 
