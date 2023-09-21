@@ -6,15 +6,23 @@ import {
   LIVING_ROOM_BUTTON_CLICK,
   LIVING_ROOM_LIGHTS_GROUP,
   LIVING_ROOM_LIGHT_ONE,
-  LIVING_ROOM_LIGHT_TWO
+  LIVING_ROOM_LIGHT_TWO,
+  LIVING_ROOM_TV_POWER
 } from 'actions/livingRoom'
-import { SET_SUNRISE_SUNSET } from 'actions/supervisor'
-import { lightOn, lightOff } from 'actions/mqttClient'
-import { deltaToTime, deltaToTimeMsec, epochPastmidnight } from 'helpers/helpers'
-import { BRIGHTNESS_HIGH, BRIGHTNESS_LOW, COLOR_TEMP_WARM, MINUTES_30_IN_SEC } from 'consts'
+import { SET_SUNRISE_SUNSET, HOME_LOW_ENERGY } from 'actions/supervisor'
+import { lightOn, lightOff, powerOff, powerOn, noop } from 'actions/mqttClient'
+import { deltaToTime, deltaToTimeMsec, epochPastmidnight, getCurrentEpoch } from 'helpers/helpers'
+import {
+  BRIGHTNESS_HIGH,
+  BRIGHTNESS_LOW,
+  COLOR_TEMP_WARM,
+  MINUTES_30_IN_SEC,
+  MINUTES_60_IN_SEC,
+  MINUTES_1_IN_MSEC
+} from 'consts'
 import type { LivingRoomButtonClickAction } from 'actions/livingRoom'
-import type { LightOn, LightOff } from 'actions/mqttClient'
-import type { SetSunriseSunsetAction } from 'actions/supervisor'
+import type { LightOn, LightOff, PowerOff, PowerOn, Noop } from 'actions/mqttClient'
+import type { SetSunriseSunsetAction, HomeLowEnergyAction } from 'actions/supervisor'
 import type { RootState } from 'store'
 
 type ButtonClickEpicReturnType = Observable<LightOn>
@@ -41,41 +49,69 @@ const buttonClickEpic = (
   })
 )
 
-type DimDownEpicReturnType = Observable<LightOn | LightOff>
+type DimDownEpicReturnType = Observable<LightOn | LightOff | Noop>
 const dimDownEpic = (
   action$: Observable<SetSunriseSunsetAction>,
   state$: StateObservable<RootState>
 ): DimDownEpicReturnType => action$.pipe(
   ofType(SET_SUNRISE_SUNSET),
-  // this fires 30 min before sunset to raise the light to full bright
-  switchMap(() => timer(deltaToTimeMsec(state$.value.supervisorReducer.sunData.sunset - MINUTES_30_IN_SEC)).pipe(
-    switchMap(() => concat(
-      of(lightOn(
-        LIVING_ROOM_LIGHTS_GROUP,
-        { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_WARM, transition: MINUTES_30_IN_SEC }
-      )),
-      // when sunset hits, dim to light 2 over time, kill one light immediately
-      timer(deltaToTimeMsec(state$.value.supervisorReducer.sunData.sunset)).pipe(
-        switchMap(() => concat(
-          of(lightOff(LIVING_ROOM_LIGHT_ONE)),
-          of(lightOn(
-            LIVING_ROOM_LIGHT_TWO,
-            {
-              brightness: BRIGHTNESS_LOW,
-              transition: deltaToTime(state$.value.supervisorReducer.sunData.civilTwilightEnd) / 1000
-            }
-          )),
-          // kill all lights at 2am
-          timer(deltaToTimeMsec(epochPastmidnight({ hours: 2 }))).pipe(
-            map(() => lightOff(LIVING_ROOM_LIGHT_TWO))
-          )
-        ))
+  switchMap(() => {
+    const currentEpoch = getCurrentEpoch()
+    if (currentEpoch > state$.value.supervisorReducer.sunData.civilTwilightEnd) { return of(noop()) }
+
+    // we are past sunset but before civilTwilightEnd
+    if (currentEpoch > state$.value.supervisorReducer.sunData.sunset) {
+      return of(
+        lightOff(LIVING_ROOM_LIGHT_ONE),
+        lightOn(
+          LIVING_ROOM_LIGHT_TWO,
+          { brightness: 1, transition: deltaToTime(state$.value.supervisorReducer.sunData.civilTwilightEnd) }
+        )
       )
-    ))
+    }
+
+    // we are before sunset
+    const idealStartTime = state$.value.supervisorReducer.sunData.sunset - MINUTES_60_IN_SEC
+    return timer(currentEpoch < idealStartTime ? deltaToTimeMsec(idealStartTime) : 0).pipe(
+      switchMap(() => concat(
+        of(lightOn(
+          LIVING_ROOM_LIGHTS_GROUP,
+          {
+            brightness: BRIGHTNESS_HIGH,
+            color_temp: COLOR_TEMP_WARM,
+            transition: deltaToTime(state$.value.supervisorReducer.sunData.sunset - MINUTES_30_IN_SEC)
+          }
+        )),
+        timer(deltaToTimeMsec(state$.value.supervisorReducer.sunData.sunset)).pipe(
+          switchMap(() => concat(
+            of(lightOff(LIVING_ROOM_LIGHT_ONE)),
+            of(lightOn(
+              LIVING_ROOM_LIGHT_TWO,
+              {
+                brightness: BRIGHTNESS_LOW,
+                transition: deltaToTime(state$.value.supervisorReducer.sunData.civilTwilightEnd) / 1000
+              }
+            )),
+            timer(deltaToTimeMsec(epochPastmidnight({ hours: 2 }))).pipe(map(() => lightOff(LIVING_ROOM_LIGHT_TWO)))
+          ))
+        )
+      ))
+    )
+  })
+)
+
+type LowEnergyEpicReturnType = Observable<LightOff | PowerOff | PowerOn>
+const lowEnergyEpic = (action$: Observable<HomeLowEnergyAction>): LowEnergyEpicReturnType => action$.pipe(
+  ofType(HOME_LOW_ENERGY),
+  switchMap(() => concat(
+    of(powerOff(LIVING_ROOM_TV_POWER)),
+    of(lightOff(LIVING_ROOM_LIGHTS_GROUP)),
+    timer(MINUTES_1_IN_MSEC).pipe(map(() => powerOn(LIVING_ROOM_TV_POWER)))
   ))
 )
 
 export default combineEpics(
   buttonClickEpic as any,
-  dimDownEpic as any
+  dimDownEpic as any,
+  lowEnergyEpic as any
 )

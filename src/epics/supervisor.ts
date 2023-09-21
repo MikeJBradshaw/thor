@@ -8,22 +8,24 @@ import {
   SUPERVISOR_INIT,
   NETWORK_ERROR,
   NETWORK_END_RESTART,
-  supervisorError,
+  homeLowEnergy,
   networkCheck,
   networkError,
   setSunriseSunset,
   networkRestart,
-  networkEndRestart
+  networkEndRestart,
+  supervisorError
 } from 'actions/supervisor'
 import { powerOn, powerOff, noop } from 'actions/mqttClient'
 import type {
-  SupervisorErrorAction,
-  SupervisorInitAction,
+  HomeLowEnergyAction,
   NetworkCheckAction,
   NetworkErrorAction,
-  SetSunriseSunsetAction,
   NetworkRestartAction,
-  NetworkEndRestartAction
+  NetworkEndRestartAction,
+  SetSunriseSunsetAction,
+  SupervisorErrorAction,
+  SupervisorInitAction
 } from 'actions/supervisor'
 import { MASTER_BEDROOM_POWER_ROUTER, MASTER_BEDROOM_POWER_MODEM } from 'actions/master'
 import { deltaToTimeMsec, epochPastmidnight, getCurrentEpoch } from 'helpers/helpers'
@@ -125,4 +127,18 @@ export const sunriseSunsetEpic = (
   ))
 )
 
-export default combineEpics(networkCheckEpic as any, networkErrorEpic as any, sunriseSunsetEpic as any)
+export const lowEnergyStateEpic = (
+  action$: Observable<SupervisorInitAction>
+): Observable<HomeLowEnergyAction> => action$.pipe(
+  ofType(SUPERVISOR_INIT),
+  switchMap(() => timer(deltaToTimeMsec(epochPastmidnight({ hours: 2, minutes: 30 })), HOURS_24_IN_MSEC).pipe(
+    map(() => homeLowEnergy())
+  ))
+)
+
+export default combineEpics(
+  lowEnergyStateEpic as any,
+  networkCheckEpic as any,
+  networkErrorEpic as any,
+  sunriseSunsetEpic as any
+)
