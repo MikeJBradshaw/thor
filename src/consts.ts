@@ -40,8 +40,12 @@ export const TEST = 'test'
 /*****************************
 * time
 * ***************************/
-export const HOURS_24 = 86400000
-export const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 5
+export const HOURS_24_IN_MSEC = 86400000
+export const MINUTES_1_IN_MSEC = 60000
+export const MINUTES_2_IN_MSEC = 120000
+export const MINUTES_5_IN_MSEC = 300000
+export const MINUTES_30_IN_SEC = 1800
+export const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 6
 
 /*****************************
 * external APIs

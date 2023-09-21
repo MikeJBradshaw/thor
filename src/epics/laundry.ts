@@ -2,16 +2,14 @@ import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
-import { MOTION_SENSOR, LAUNDRY_LIGHTS } from 'actions/laundry'
-import { lightOnPublish, noop } from 'actions/mqttClient'
+import { MOTION_SENSOR, LAUNDRY_LIGHTS_GROUP } from 'actions/laundry'
+import { lightOn, lightOff, noop } from 'actions/mqttClient'
+import { BRIGHTNESS_HIGH } from 'consts'
 import type { RootState } from 'store'
 import type { MotionSensorAction } from 'actions/laundry'
-import type { LightOnPublish, Noop } from 'actions/mqttClient'
+import type { LightOn, LightOff, Noop } from 'actions/mqttClient'
 
-const BRIGHTNESS_HIGH = 255
-const BRIGHTNESS_OFF = 0
-
-type MotionSensorEpicReturnType = Observable<LightOnPublish | Noop>
+type MotionSensorEpicReturnType = Observable<LightOn | LightOff | Noop>
 const motionSensorEpic = (
   action$: Observable<MotionSensorAction>,
   state$: StateObservable<RootState>
@@ -23,13 +21,11 @@ const motionSensorEpic = (
     } else {
       if (occupancy) {
         return of(
-          lightOnPublish(LAUNDRY_LIGHTS[0], { brightness: BRIGHTNESS_HIGH }),
-          lightOnPublish(LAUNDRY_LIGHTS[1], { brightness: BRIGHTNESS_HIGH })
+          lightOn(LAUNDRY_LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH })
         )
       }
       return of(
-        lightOnPublish(LAUNDRY_LIGHTS[0], { brightness: BRIGHTNESS_OFF }),
-        lightOnPublish(LAUNDRY_LIGHTS[1], { brightness: BRIGHTNESS_OFF })
+        lightOff(LAUNDRY_LIGHTS_GROUP)
       )
     }
   })

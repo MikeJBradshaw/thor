@@ -12,11 +12,10 @@ import {
   masterBathTimer,
   masterBathTimerExpire
 } from 'actions/master'
-import { lightOnPublish, noop } from 'actions/mqttClient'
+import { lightOn, lightOff, noop } from 'actions/mqttClient'
 import {
   BRIGHTNESS_HIGH,
   BRIGHTNESS_LOW,
-  BRIGHTNESS_OFF,
   BUTTON_STATE_SINGLE,
   COLOR_TEMP_NEUTRAL,
   COLOR_RED_HEX,
@@ -31,14 +30,14 @@ import type {
   MasterBathTimerAction,
   MasterBathTimerExpireAction
 } from 'actions/master'
-import type { LightOnPublish, Noop } from 'actions/mqttClient'
+import type { LightOn, LightOff, Noop } from 'actions/mqttClient'
 
 const DAY_END = '20:30:00'
 const DAY_START = '06:45:00'
 
 const isNight = (date: string): boolean => date >= DAY_END || date <= DAY_START
 
-type MotionSensorEpicReturnType = Observable<LightOnPublish | Noop>
+type MotionSensorEpicReturnType = Observable<LightOn | LightOff | Noop>
 const motionSensorEpic = (
   action$: Observable<MasterBathMotionSensorAction>,
   state$: StateObservable<RootState>
@@ -55,27 +54,27 @@ const motionSensorEpic = (
         const date = new Date().toLocaleTimeString('en', { hour12: false })
 
         if (isNight(date)) {
-          return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }))
+          return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }))
         }
 
-        return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
+        return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
       }
 
-      return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_OFF, color_temp: COLOR_TEMP_NEUTRAL }))
+      return of(lightOff(LIGHTS_GROUP))
     }
   })
 )
 
-type ButtonHoldEpicReturnType = Observable<LightOnPublish>
+type ButtonHoldEpicReturnType = Observable<LightOn>
 const buttonHoldEpic = (
   action$: Observable<MasterBathButtonHoldAction>,
   state$: StateObservable<RootState>
 ): ButtonHoldEpicReturnType => action$.pipe(
   ofType(MASTER_BATH_BUTTON_HOLD),
-  switchMap(() => of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL })))
+  switchMap(() => of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL })))
 )
 
-type ButtonReleaseEpicReturnType = Observable<LightOnPublish>
+type ButtonReleaseEpicReturnType = Observable<LightOn>
 const buttonReleaseEpic = (
   action$: Observable<MasterBathButtonReleaseAction>,
   state$: StateObservable<RootState>
@@ -85,14 +84,14 @@ const buttonReleaseEpic = (
     const date = new Date().toLocaleTimeString('en', { hour12: false })
 
     if (isNight(date)) {
-      return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }))
+      return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }))
     }
 
-    return of(lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
+    return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
   })
 )
 
-type ButtonClickEpicReturnType = Observable<LightOnPublish | MasterBathTimerAction | MasterBathTimerExpireAction | Noop>
+type ButtonClickEpicReturnType = Observable<LightOn | MasterBathTimerAction | MasterBathTimerExpireAction | Noop>
 const buttonClickEpic = (
   action$: Observable<MasterBathButtonClickAction | MasterBathTimerExpireAction>,
   state$: StateObservable<RootState>
@@ -108,7 +107,7 @@ const buttonClickEpic = (
       }
       // need to turn lights on and start a timer
       return of(
-        lightOnPublish(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }),
+        lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }),
         masterBathTimer()
       )
     }

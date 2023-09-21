@@ -3,6 +3,8 @@ import type { ButtonPayload, MotionSensorPayload } from 'types/payloads'
 export const LIGHTS_GROUP = 'z2m/master_bath_lights'
 export const MASTER_BATH_LIGHT_1 = 'z2m/sink/master_bath/light/light_1'
 export const MASTER_BATH_LIGHT_2 = 'z2m/sink/master_bath/light/light_2'
+export const MASTER_BEDROOM_POWER_ROUTER = 'z2m/sink/master_bedroom/power/router'
+export const MASTER_BEDROOM_POWER_MODEM = 'z2m/sink/master_bedroom/power/internet'
 
 export const MASTER_BATH_BUTTON_CLICK = 'MASTER_BATH_BUTTON_CLICK'
 export interface MasterBathButtonClickAction { type: typeof MASTER_BATH_BUTTON_CLICK, payload: ButtonPayload }

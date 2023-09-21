@@ -23,9 +23,7 @@ import {
   masterBathButtonRelease,
   masterBathMotionSensor
 } from 'actions/master'
-import {
-  livingRoomButtonClick
-} from 'actions/livingRoom'
+import { livingRoomButtonClick } from 'actions/livingRoom'
 import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
 import { supervisorInit } from 'actions/supervisor'
 import {
@@ -45,12 +43,8 @@ import {
   TEMP_HUMIDITY,
   TEST
 } from 'consts'
-import {
-} from 'types/payloads'
 import routes from 'routes'
 import store from 'store'
-
-// import AbortController from 'abort-controller'
 
 global.fetch = fetch
 
@@ -62,17 +56,21 @@ const LOCALHOST = 'localhost'
 const LEVEL = process.env.level
 if (LEVEL !== TEST && LEVEL !== PRODUCTION) {
   process.exitCode = -2
-  console.error('Env "level" is not of "test" or "production"')
+  console.error(`Env "${PRODUCTION}" is not of "${TEST}" or "production"`)
   process.exit()
 }
 const CONNECTION_STRING = `mqtt://${LEVEL === 'test' ? TEST_ADDRESS : LOCALHOST}:1883`
 const DEBUG_STATE = process.env.debug_state === 'true'
 const LOG_PUBLISH = process.env.log_publish === 'true'
+const LOG_ACTION = process.env.log_action === 'true'
+const SHOW_SUB_MESSAGE = process.env.show_sub_msg === 'true'
 
 console.log('###########################################################')
 console.log('LEVEL:            ', LEVEL)
 console.log('DEBUG_STATE:      ', DEBUG_STATE)
 console.log('LOG_PUBLISH:      ', LOG_PUBLISH)
+console.log('LOG_ACTION:       ', LOG_ACTION)
+console.log('SHOW_SUB_MESSAGE: ', SHOW_SUB_MESSAGE)
 console.log('CONNECTION_STRING:', CONNECTION_STRING)
 console.log('###########################################################')
 
@@ -181,6 +179,9 @@ client.on('connect', () => {
 
     client.on('message', (topic, buffer) => {
       const [_, __, entity, device] = topic.split('/')
+      if (SHOW_SUB_MESSAGE) {
+        console.log('topic:', topic, 'buffer:', JSON.stringify(buffer))
+      }
 
       switch (entity) {
         case BEDROOM_ONE:
@@ -239,7 +240,7 @@ const middlewares = [logger$(), bodyParser$()]
 const server = createServer({
   listener: httpListener({ middlewares, effects: [routes] }),
   hostname: '0.0.0.0',
-  port: 3000
+  port: 3001
 })
 
 const main: IO<void> = async () => await (await server)()
@@ -247,7 +248,7 @@ const main: IO<void> = async () => await (await server)()
 main()
 
 process.on('SIGINT', () => {
-  console.log('CAUGHT SHUTDOWN SIGNAL, SHUTTING DOWN...')
+  console.log('\nCAUGHT SHUTDOWN SIGNAL, SHUTTING DOWN...')
   // future messaging that its going down
   process.exit()
 })

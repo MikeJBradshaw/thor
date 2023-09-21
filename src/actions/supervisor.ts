@@ -1,5 +1,3 @@
-import type { SunData } from 'types/payloads'
-
 export const SUPERVISON_ERROR = 'SUPERVISON_ERROR'
 export interface SupervisorErrorAction { type: typeof SUPERVISON_ERROR, err: Error }
 export const supervisorError = (err: Error): SupervisorErrorAction => ({ type: SUPERVISON_ERROR, err })
@@ -8,27 +6,45 @@ export const SUPERVISOR_INIT = 'SUPERVISOR_INIT'
 export interface SupervisorInitAction { type: typeof SUPERVISOR_INIT }
 export const supervisorInit = (): SupervisorInitAction => ({ type: SUPERVISOR_INIT })
 
-export const SUPERVISOR_NETWORK_CHECK = 'SUPERVISOR_NETWORK_CHECK'
-export interface SupervisorNetworkCheckAction { type: typeof SUPERVISOR_NETWORK_CHECK, responseTime: Date }
-export const supervisorNetworkCheck = (
-  responseTime: Date
-): SupervisorNetworkCheckAction => ({ type: SUPERVISOR_NETWORK_CHECK, responseTime })
+export const NETWORK_CHECK = 'SUPERVISOR_NETWORK_CHECK'
+export interface NetworkCheckAction { type: typeof NETWORK_CHECK, responseEpoch: number }
+export const networkCheck = (responseEpoch: number): NetworkCheckAction => ({ type: NETWORK_CHECK, responseEpoch })
 
-export const SUPERVISOR_NETWORK_ERROR = 'SUPERVISOR_NETWORK_ERROR'
-export interface SupervisorNetworkErrorAction { type: typeof SUPERVISOR_NETWORK_ERROR }
-export const supervisorNetworkError = (): SupervisorNetworkErrorAction => ({ type: SUPERVISOR_NETWORK_ERROR })
+export const NETWORK_END_RESTART = 'SUPERVISOR_NETWORK_END_RESTART'
+export interface NetworkEndRestartAction { type: typeof NETWORK_END_RESTART }
+export const networkEndRestart = (): NetworkEndRestartAction => ({ type: NETWORK_END_RESTART })
 
-export const SUPERVISOR_SET_SUNRISE_SUNSET = 'SUPERVISOR_SET_SUNRISE_SUNSET'
-export interface SupervisorSetSunriseSunsetAction {
-  type: typeof SUPERVISOR_SET_SUNRISE_SUNSET
-  data: SunData
+export const NETWORK_ERROR = 'SUPERVISOR_NETWORK_ERROR'
+export interface NetworkErrorAction { type: typeof NETWORK_ERROR }
+export const networkError = (): NetworkErrorAction => ({ type: NETWORK_ERROR })
+
+export const NETWORK_RESTART = 'SUPERVISOR_NETWORK_RESTART'
+export interface NetworkRestartAction { type: typeof NETWORK_RESTART }
+export const networkRestart = (): NetworkRestartAction => ({ type: NETWORK_RESTART })
+
+export const SET_SUNRISE_SUNSET = 'SUPERVISOR_SET_SUNRISE_SUNSET'
+export interface SetSunriseSunsetAction {
+  type: typeof SET_SUNRISE_SUNSET
+  payload: {
+    sunrise: string
+    sunset: string
+    solarNoon: string
+    civilTwilightBegin: string
+    civilTwilightEnd: string
+  }
 }
-export const supervisorSetSunriseSunset = (
-  data: SunData
-): SupervisorSetSunriseSunsetAction => ({ type: SUPERVISOR_SET_SUNRISE_SUNSET, data })
+export const setSunriseSunset = (
+  sunrise: string,
+  sunset: string,
+  solarNoon: string,
+  civilTwilightBegin: string,
+  civilTwilightEnd: string
+): SetSunriseSunsetAction => ({ type: SET_SUNRISE_SUNSET, payload: { sunrise, sunset, solarNoon, civilTwilightBegin, civilTwilightEnd }})
 
 export type SupervisorAction = SupervisorInitAction
 | SupervisorErrorAction
-| SupervisorNetworkCheckAction
-| SupervisorNetworkErrorAction
-| SupervisorSetSunriseSunsetAction
+| NetworkCheckAction
+| NetworkEndRestartAction
+| NetworkErrorAction
+| NetworkRestartAction
+| SetSunriseSunsetAction

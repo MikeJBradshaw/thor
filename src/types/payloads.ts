@@ -47,9 +47,9 @@ export interface PowerPayload {
 }
 
 export interface SunData {
-  sunrise: string
-  sunset: string
-  solarNoon: string
-  civilTwilightBegin: string
-  civilTwilightEnd: string
+  sunrise: number
+  sunset: number
+  solarNoon: number
+  civilTwilightBegin: number
+  civilTwilightEnd: number
 }

@@ -1,17 +1,45 @@
 import { DateTime } from 'luxon'
-/**
- * @remarks calculates the delta to midnight from right now
- *
- * @returns number: the milliseconds to midnight
- */
-export const deltaToMidnight = (): number => {
-  const date = DateTime.now().toLocal().endOf('day').plus({ hours: 1 })
-  return date.diffNow().toMillis()
+
+interface DateObject {
+  hours?: number
+  minutes?: number
 }
 
 /**
- * @remarks Turns UTC to local
+ * @remarks calculates the delta between now and specified unix epoch
  *
- * @returns string: datetime to 24 hours local
+ * @returns number: seconds till provided date time
  */
-export const utcDateToLocal = (dateString: string): string => new Date(dateString).toLocaleString('en-us', { hour12: false })
+export const deltaToTime = (epoch: number): number => epoch - DateTime.now().toLocal().toUnixInteger()
+
+/**
+ * @remarks calculates the delta between now and specified unix epoch
+ *
+ * @returns number: milliseconds till provided dateTime
+ */
+export const deltaToTimeMsec = (epoch: number): number => (epoch - DateTime.now().toLocal().toUnixInteger()) * 1000
+
+/**
+ * @remarks Turns Date string to epoch
+ *
+ * @returns number: epoch time
+ */
+export const dateToEpoch = (dateString: string): number => {
+  return DateTime.fromJSDate(new Date(dateString)).toLocal().toUnixInteger()
+}
+
+/**
+ * @remarks calculates the unix epoch hours/minutes past midnight
+ *
+ * @returns number: the unix epoch time for specified time past midnight
+ */
+export const epochPastmidnight = (
+  obj: DateObject
+): number => DateTime.now().endOf('day').plus(obj).toUnixInteger()
+
+/**
+ * @remarks gets the current local epoch
+ *
+ * @returns number: the current local epoch
+ */
+export const getCurrentEpoch = (): number => DateTime.now().toLocal().toUnixInteger()

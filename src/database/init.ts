@@ -1,9 +1,15 @@
 import { Database } from 'sqlite3'
-import fs from 'fs'
+import { load } from 'js-yaml'
+import { Client } from 'node-scp'
+import { readFileSync } from 'fs'
 
+import { ENTITIES, PRODUCTION, TEST } from 'consts'
+import type { Z2mConfigYaml } from 'types/external'
 import config from 'configuration.json'
 
-const logError = (err: Error) => console.error(`ERROR LOGGING DEVICE: ${err.message}\n${err.stack}`)
+const TMP_CONFIG_FILE = 'config.tmp.yaml'
+
+const logError = (err: Error): void => console.error(`ERROR LOGGING DEVICE: ${err.message}`)
 
 /**
  * Drops all tables and creates new ones
@@ -12,110 +18,108 @@ const logError = (err: Error) => console.error(`ERROR LOGGING DEVICE: ${err.mess
  *
  * @returns void
  */
-const initDatabase = (): void => {
+const initDatabase = (z2mConfig: string): void => {
   const { database: { type, fileName } } = config
   console.log(`Detected database type: ${type} database location: ${type === 'file' ? fileName : 'memory'}`)
   const db = new Database(type === 'file' ? fileName : ':memory:')
 
+  console.log('READING ZIGBEE2MQTT CONFIG...')
+
   console.log('DROPPING TABLES...')
   db.serialize(() => {
+    db.run('DROP TABLE IF EXISTS entity')
     db.run('DROP TABLE IF EXISTS device')
-    db.run('DROP TABLE IF EXISTS event_audit')
-    db.run('DROP TABLE IF EXISTS action_audit')
+    db.run('DROP TABLE IF EXISTS entity_device')
   })
 
   db.serialize(() => {
     console.log('CREATING TABLES...')
+    console.log('CREATING TABLE "entity"')
+    db.run('CREATE TABLE entity (id INTEGER, name TEXT UNIQUE NOT NULL, key TEXT UNIQUE NOT NULL, PRIMARY KEY(id))')
+
     console.log('CREATING TABLE "device"')
     db.run(
-      'CREATE TABLE device (id INTEGER, friendly_name TEXT, display_name TEXT, location TEXT, type TEXT, description TEXT, ieee_address TEXT, PRIMARY KEY(id))'
+      'CREATE TABLE device (id INTEGER, friendly_name TEXT UNIQUE, display_name TEXT, description TEXT, ieee_address TEXT UNIQUE NOT NULL, PRIMARY KEY(id))'
     )
 
-    console.log('CREATING TABLE "event_audit"')
-    db.run('CREATE TABLE event_audit (id INTEGER, date_time TEXT, uuid TEXT, entity, TEXT, device TEXT, payload TEXT, PRIMARY KEY(id))')
-
-    console.log('CREATING TABLE "action_audit"')
-    db.run('CREATE TABLE action_audit (id INTEGER, date_time TEXT, uuid TEXT, topic TEXT, payload TEXT, PRIMARY KEY(id))')
+    console.log('CREATING TABLE "entity_device"')
+    db.run('CREATE TABLE entity_device (id INTEGER, entity_id INTEGER, device_id, INTEGER, FOREIGN KEY (entity_id) REFERENCES entity(id), FOREIGN KEY (device_id) REFERENCES device(id), PRIMARY KEY(id))')
   })
 
   db.serialize(() => {
-    console.log('ADDING DEVICES...')
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['property/bed_4/soil_mositure/sensor_1', 'Bed 4 Soil Moisture', 'bed 4', 'soil_moisture', 'Soil moisture sensor for bed 4', '0xa4c12866ec52b2ac'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['property/chicken_coop/temp_humidity/sensor_1', 'Chicken coop temp and humidity', 'chicken coop', 'temp_and_humidity', 'Temperature and humidty in chicken coop', '0x1c34f1fffeecdd6f'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['property/bed_5/soil_mositure/sensor_1', 'Bed 5 Soil Moisture', 'bed 5', 'soil_moisture', 'Soil moisture sensor for bed 5', '0x41c1381d2125ad62'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['property/bed_2/soil_mositure/sensor_1', 'Bed 2 Soil Moisture', 'bed_2', 'soil_moisture', 'Soil moisture sensor for bed 2', '0xa4c13829c00d5078'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/lola/light/light_1', 'Lola Overhead Light', 'lola', 'light', 'Light 1 for Lolas room', '0xb0ce18140015ba9a'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/master_bath/light/light_1', 'Master Bathroom Light', 'master_bath', 'light', 'Light 1 for master bathroom', '0xb0ce18140015b105'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/master_bath/motion_sensor/bathroom', 'Master Bathroom Motion Sensor', 'master_bath', 'motion_sensor', 'Motion sensor in master bathroom', '0x282c02bfffed3441'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/master_bath/light/light_2', 'Master Bathroom Light', 'master_bath', 'light', 'Light 2 for master bathroom', '0xb0ce18140015be41'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/lola/light/light_2', 'Lola Overhead Light', 'lola', 'light', 'Light 2 for Lolas room', '0xb0ce18140015ae57'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/laundry/motion_sensor/laundry', 'Laundry Motion Sensor', 'laundry', 'motion_sensor', 'Motion sensor in laundry room', '0x282c02bfffed39e8'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/laundry/light/light_1', 'Laundry Light', 'laundry', 'light', 'Light 1 in laundry room', '0xb0ce1814036753ea'],
-      (err) => err !== null ? logError(err) : ''
-    )
-
-    db.run(
-      'INSERT INTO device(friendly_name, display_name, location, type, description, ieee_address) VALUES(?, ?, ?, ?, ?, ?)',
-      ['home/laundry/light/light_2', 'Laundry Light', 'laundry', 'light', 'Light 2 in laundry room', '0xb0ce18140367646d'],
-      (err) => err !== null ? logError(err) : ''
-    )
+    console.log('ADDING ENTITIES...')
+    for (const entity of ENTITIES) {
+      console.log(' entity:', entity)
+      const name = entity.replace('_', ' ').toUpperCase()
+      db.run('INSERT INTO entity(name, key) VALUES (?, ?)', [name, entity], err => err !== null ? logError(err) : () => {})
+    }
   })
+
+  console.log('GETTING DEVICE INFO FROM CONFIG FILE...')
+  const configDoc = load(readFileSync(z2mConfig, 'utf-8')) as Z2mConfigYaml
+  const devices = configDoc.devices
+
+  console.log('ADDING DEVICES...')
+  db.serialize(() => {
+    for (const [ieeeAddress, deviceInfo] of Object.entries(devices)) {
+      const [_, entity, type, __] = deviceInfo.friendly_name.split('/')
+      if (entity === undefined || type === undefined) {
+        continue
+      }
+
+      console.log(' device:', deviceInfo.friendly_name)
+      db.run(
+        'INSERT INTO device(friendly_name, display_name, description, ieee_address) VALUES (?, ?, ?, ?)',
+        [deviceInfo.friendly_name, deviceInfo.display_name, deviceInfo.description, ieeeAddress],
+        function (err: Error) {
+          if (err !== null) {
+            logError(err)
+            return
+          }
+          return this.lastID
+        }
+      )
+
+      const entityIndex = ENTITIES.indexOf(entity) + 1
+      db.run(
+        'INSERT INTO entity_device(device_id, entity_id) VALUES(last_insert_rowid(), ?)',
+        [entityIndex],
+        (err: Error) => err !== null ? logError(err) : () => { }
+      )
+    }
+  })
+
   console.log('DONE')
   db.close()
 }
 
-if (require.main === module) {
-  initDatabase()
+const LEVEL = process.env.level
+const PRIVATE_KEY_PATH = process.env.private_key_path
+if (LEVEL !== PRODUCTION && LEVEL !== TEST) {
+  console.error(`Level was not set or not recognized. Set level to "${PRODUCTION}" or "${TEST}" and retry.`)
+  process.exit(-1)
 }
+
+if (PRIVATE_KEY_PATH === undefined || PRIVATE_KEY_PATH === '') {
+  console.error('Private key path not found. Set "private_key_path" and retry.')
+  process.exit(-1)
+}
+
+(async () => {
+  try {
+    if (LEVEL === 'test') {
+      const scpClient = await Client({
+        host: '10.243.31.95',
+        port: 22,
+        username: 'mike',
+        privateKey: readFileSync(PRIVATE_KEY_PATH)
+      })
+      await scpClient.downloadFile(config.z2mConfigLocation, TMP_CONFIG_FILE)
+      scpClient.close()
+    }
+  } catch (err) {
+    console.error(err)
+  }
+
+  initDatabase(LEVEL === PRODUCTION ? config.z2mConfigLocation : TMP_CONFIG_FILE)
+})().catch(e => console.error(e))

@@ -7,11 +7,11 @@ import {
   BEDROOM_ONE_BUTTON_HOLD,
   BEDROOM_ONE_BUTTON_RELEASE,
   BEDROOM_ONE_LIGHTS_GROUP,
-  BEDROOM_ONE_POWER_ONE,
-  BEDROOM_ONE_LIGHT_1,
-  BEDROOM_ONE_LIGHT_2
+  BEDROOM_ONE_POWER_ONE
+  // BEDROOM_ONE_LIGHT_1,
+  // BEDROOM_ONE_LIGHT_2
 } from 'actions/bedroomOne'
-import { lightOnPublish, noop, powerOn, powerOff } from 'actions/mqttClient'
+import { lightOn, lightOff, noop, powerOn, powerOff } from 'actions/mqttClient'
 import { ROOM_STATE_DOUBLE, ROOM_STATE_SINGLE, RAINBOW_COLORS } from 'consts'
 import type { RootState } from 'store'
 import type {
@@ -19,9 +19,9 @@ import type {
   BedroomOneButtonHoldAction,
   BedroomOneButtonReleaseAction
 } from 'actions/bedroomOne'
-import type { LightOnPublish, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
+import type { LightOn, LightOff, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
 
-type ButtonClickedEpicReturnType = Observable<LightOnPublish | Noop | PowerOn | PowerOff>
+type ButtonClickedEpicReturnType = Observable<LightOn | Noop | PowerOn | PowerOff>
 const buttonClickEpic = (
   action$: Observable<BedroomOneButtonClickAction>,
   state$: StateObservable<RootState>
@@ -41,14 +41,14 @@ const buttonClickEpic = (
         : { color_temp: state$.value.bedroomOneReducer.doubleClickState.values.colorTemp }
 
       return of(
-        lightOnPublish(
+        lightOn(
           BEDROOM_ONE_LIGHTS_GROUP,
           {
             brightness: state$.value.bedroomOneReducer.doubleClickState.values.brightness,
             ...colorPackage
           }
         ),
-        powerOff(BEDROOM_ONE_POWER_ONE, { state: 'OFF', power_on_behavior: 'on' })
+        powerOff(BEDROOM_ONE_POWER_ONE)
       )
     }
 
@@ -59,14 +59,14 @@ const buttonClickEpic = (
         : { color_temp: state$.value.bedroomOneReducer.singleClickState.values.colorTemp }
 
       return of(
-        lightOnPublish(
+        lightOn(
           BEDROOM_ONE_LIGHTS_GROUP,
           {
             brightness: state$.value.bedroomOneReducer.singleClickState.values.brightness,
             ...colorPackage
           }
         ),
-        powerOn(BEDROOM_ONE_POWER_ONE, { state: 'ON' })
+        powerOn(BEDROOM_ONE_POWER_ONE)
       )
     }
 
@@ -77,28 +77,28 @@ const buttonClickEpic = (
     const brightness = state$.value.bedroomOneReducer.defaultState.values.brightness
 
     return of(
-      lightOnPublish(BEDROOM_ONE_LIGHTS_GROUP, { brightness, ...colorPackage }),
-      powerOff(BEDROOM_ONE_POWER_ONE, { state: 'OFF', power_on_behavior: 'on' })
+      lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness, ...colorPackage }),
+      powerOff(BEDROOM_ONE_POWER_ONE)
     )
   })
 )
 
 // TODO: not working correctly
-type ButtonHoldEpicReturnType = Observable<LightOnPublish>
+type ButtonHoldEpicReturnType = Observable<LightOn>
 const buttonHoldEpic = (
   action$: Observable<BedroomOneButtonHoldAction | BedroomOneButtonReleaseAction>
 ): ButtonHoldEpicReturnType => action$.pipe(
   ofType(BEDROOM_ONE_BUTTON_HOLD),
   switchMap(() => interval(1000).pipe(
     map((val: number) => {
-      return lightOnPublish(BEDROOM_ONE_LIGHTS_GROUP, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
+      return lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
     }),
     takeUntil(action$.pipe(ofType(BEDROOM_ONE_BUTTON_RELEASE)))
   ))
 )
 
 // TODO: not working correctly
-type ButtonReleaseEpicReturnType = Observable<LightOnPublish | PowerOn | PowerOff>
+type ButtonReleaseEpicReturnType = Observable<LightOn | PowerOn | PowerOff>
 export const buttonReleaseEpic = (
   action$: Observable<BedroomOneButtonReleaseAction>,
   state$: StateObservable<RootState>
@@ -113,14 +113,14 @@ export const buttonReleaseEpic = (
         : { color_temp: state$.value.bedroomOneReducer.doubleClickState.values.colorTemp }
 
       return of(
-        lightOnPublish(
+        lightOn(
           BEDROOM_ONE_LIGHTS_GROUP,
           {
             brightness: state$.value.bedroomOneReducer.doubleClickState.values.brightness,
             ...colorPackage
           }
         ),
-        powerOff(BEDROOM_ONE_POWER_ONE, { state: 'OFF', power_on_behavior: 'on' })
+        powerOff(BEDROOM_ONE_POWER_ONE)
       )
     }
 
@@ -131,14 +131,14 @@ export const buttonReleaseEpic = (
         : { color_temp: state$.value.bedroomOneReducer.singleClickState.values.colorTemp }
 
       return of(
-        lightOnPublish(
+        lightOn(
           BEDROOM_ONE_LIGHTS_GROUP,
           {
             brightness: state$.value.bedroomOneReducer.singleClickState.values.brightness,
             ...colorPackage
           }
         ),
-        powerOn(BEDROOM_ONE_POWER_ONE, { state: 'ON' })
+        powerOn(BEDROOM_ONE_POWER_ONE)
       )
     }
 
@@ -149,8 +149,8 @@ export const buttonReleaseEpic = (
     const brightness = state$.value.bedroomOneReducer.defaultState.values.brightness
 
     return of(
-      lightOnPublish(BEDROOM_ONE_LIGHTS_GROUP, { brightness, ...colorPackage }),
-      powerOff(BEDROOM_ONE_POWER_ONE, { state: 'OFF', power_on_behavior: 'on' })
+      lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness, ...colorPackage }),
+      powerOff(BEDROOM_ONE_POWER_ONE)
     )
   })
 )
