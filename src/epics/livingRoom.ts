@@ -89,7 +89,7 @@ const dimDownEpic = (
               LIVING_ROOM_LIGHT_TWO,
               {
                 brightness: BRIGHTNESS_LOW,
-                transition: deltaToTime(state$.value.supervisorReducer.sunData.civilTwilightEnd) / 1000
+                transition: deltaToTime(state$.value.supervisorReducer.sunData.civilTwilightEnd)
               }
             )),
             timer(deltaToTimeMsec(epochPastmidnight({ hours: 2 }))).pipe(map(() => lightOff(LIVING_ROOM_LIGHT_TWO)))
