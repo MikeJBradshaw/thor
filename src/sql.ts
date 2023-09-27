@@ -1,1 +1,2 @@
-export const GET_ALL_DEVICES = 'SELECT * FROM DEVICE'
+export const GET_ALL_DEVICES = 'SELECT * FROM device'
+export const GET_ALL_ENTITIES = 'SELECT * FROM entity'

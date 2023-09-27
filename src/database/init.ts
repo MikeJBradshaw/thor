@@ -30,6 +30,7 @@ const initDatabase = (z2mConfig: string): void => {
     db.run('DROP TABLE IF EXISTS entity')
     db.run('DROP TABLE IF EXISTS device')
     db.run('DROP TABLE IF EXISTS entity_device')
+    db.run('DROP TABLE IF EXISTS transition')
   })
 
   db.serialize(() => {
@@ -38,12 +39,13 @@ const initDatabase = (z2mConfig: string): void => {
     db.run('CREATE TABLE entity (id INTEGER, name TEXT UNIQUE NOT NULL, key TEXT UNIQUE NOT NULL, PRIMARY KEY(id))')
 
     console.log('CREATING TABLE "device"')
-    db.run(
-      'CREATE TABLE device (id INTEGER, friendly_name TEXT UNIQUE, display_name TEXT, description TEXT, ieee_address TEXT UNIQUE NOT NULL, PRIMARY KEY(id))'
-    )
+    db.run('CREATE TABLE device (id INTEGER, friendly_name TEXT UNIQUE, display_name TEXT, description TEXT, ieee_address TEXT UNIQUE NOT NULL, PRIMARY KEY(id))')
 
     console.log('CREATING TABLE "entity_device"')
-    db.run('CREATE TABLE entity_device (id INTEGER, entity_id INTEGER, device_id, INTEGER, FOREIGN KEY (entity_id) REFERENCES entity(id), FOREIGN KEY (device_id) REFERENCES device(id), PRIMARY KEY(id))')
+    db.run('CREATE TABLE entity_device (id INTEGER, entity_id INTEGER, device_id INTEGER, FOREIGN KEY (entity_id) REFERENCES entity(id), FOREIGN KEY (device_id) REFERENCES device(id), PRIMARY KEY(id))')
+
+    console.log('CREATING TABLE "transition"')
+    db.run('CREATE TABLE state (id: INTEGER, device_id INTEGER, start_time INTEGER, duration INTEGER, end_time INTEGER), PRIMARY KEY(id), FOREIGN KEY (device_id) REFERENCES device(id)')
   })
 
   db.serialize(() => {
