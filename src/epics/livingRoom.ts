@@ -33,18 +33,10 @@ const buttonClickEpic = (
   ofType(LIVING_ROOM_BUTTON_CLICK),
   map(() => {
     // TODO: what if its night?
-    // const buttonAction = state$.value.livingRoomReducer.buttonState.action
-    const override = state$.value.livingRoomReducer.overrideLivingRoomLights
-    if (override) {
-      return lightOn(
-        LIVING_ROOM_LIGHTS_GROUP,
-        { brightness: BRIGHTNESS_HIGH }
-      )
-    }
-
+    const power = state$.value.livingRoomReducer.lightPower
     return lightOn(
       LIVING_ROOM_LIGHTS_GROUP,
-      { brightness: BRIGHTNESS_LOW }
+      { brightness: power }
     )
   })
 )
