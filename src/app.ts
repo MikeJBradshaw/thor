@@ -43,7 +43,7 @@ import {
   TEMP_HUMIDITY,
   TEST
 } from 'consts'
-import routes from 'routes'
+import v1$ from 'routes'
 import store from 'store'
 
 global.fetch = fetch
@@ -180,7 +180,7 @@ client.on('connect', () => {
     client.on('message', (topic, buffer) => {
       const [_, __, entity, device] = topic.split('/')
       if (SHOW_SUB_MESSAGE) {
-        console.log('topic:', topic, 'buffer:', JSON.stringify(buffer))
+        console.log('topic:', topic, 'buffer:', JSON.stringify(buffer.toString()))
       }
 
       switch (entity) {
@@ -238,7 +238,7 @@ store.subscribe(() => {
  * *************/
 const middlewares = [logger$(), bodyParser$()]
 const server = createServer({
-  listener: httpListener({ middlewares, effects: [routes] }),
+  listener: httpListener({ middlewares, effects: [v1$] }),
   hostname: '0.0.0.0',
   port: 3001
 })

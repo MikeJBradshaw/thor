@@ -2,32 +2,33 @@ import { combineRoutes, r } from '@marblejs/http'
 import { from, of } from 'rxjs'
 import { concatMap, tap, map, catchError } from 'rxjs/operators'
 
-import { GET_ALL_DEVICES } from 'sql'
+import { GET_ALL_ENTITIES } from 'sql'
 import { DBEngine } from 'database/engine'
 import config from 'configuration.json'
 
 const { type, fileName } = config.database
 const engine = new DBEngine(type === 'file' ? fileName : ':memory:')
 
-interface Device {
+interface Entity {
   id: number
-  friendly_name: string
+  name: string
+  key: string
 }
 
-const devicesGet$ = r.pipe(
+const entitiesGet$ = r.pipe(
   r.matchPath('/'),
   r.matchType('GET'),
   r.useEffect(req$ => req$.pipe(
-    concatMap(req => from(engine.all(GET_ALL_DEVICES)).pipe(
+    concatMap(req => from(engine.all(GET_ALL_ENTITIES)).pipe(
       tap(console.log),
-      map((data: Device[]) => ({ body: { data } }))
+      map((data: Entity[]) => ({ body: { data } }))
     )),
     catchError(err => of(err))
   ))
 )
 
-const devices$ = combineRoutes('/device', [
-  devicesGet$
+const entities$ = combineRoutes('/entity', [
+  entitiesGet$
 ])
 
-export default devices$
+export default entities$

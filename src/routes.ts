@@ -1,28 +1,11 @@
-import { combineRoutes, r } from '@marblejs/http'
-import { mapTo } from 'rxjs/operators'
+import { combineRoutes } from '@marblejs/http'
 
 import devices$ from 'endpoints/devices'
+import entities$ from 'endpoints/entities'
 
-const root$ = r.pipe(
-  r.matchPath('/'),
-  r.matchType('GET'),
-  r.useEffect(req$ => req$.pipe(
-    mapTo({ body: 'Hello, from root bitch!' })
-  ))
-)
-
-const foo$ = r.pipe(
-  r.matchPath('/foo'),
-  r.matchType('GET'),
-  r.useEffect(req$ => req$.pipe(
-    mapTo({ body: 'Hello, from foo leprecon!' })
-  ))
-)
-
-const all$ = combineRoutes('/api/v1', [
-  root$,
-  foo$,
-  devices$
+const v1$ = combineRoutes('/api/v1', [
+  devices$,
+  entities$
 ])
 
-export default all$
+export default v1$
