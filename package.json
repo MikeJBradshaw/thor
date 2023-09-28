@@ -25,7 +25,7 @@
     "typescript": "^5.1.6"
   },
   "name": "VALHALLA",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Versatile Automation and Lifestyle Hub with Advanced Lighting and Logic Assistance (VALHALLA)",
   "main": "app.ts",
   "scripts": {
