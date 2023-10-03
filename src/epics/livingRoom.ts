@@ -16,6 +16,7 @@ import {
   BRIGHTNESS_HIGH,
   BRIGHTNESS_LOW,
   COLOR_TEMP_WARM,
+  MINUTES_15_IN_SEC,
   MINUTES_30_IN_SEC,
   MINUTES_60_IN_SEC,
   MINUTES_1_IN_MSEC
@@ -76,7 +77,7 @@ const dimDownEpic = (
         )),
         timer(deltaToTimeMsec(state$.value.supervisorReducer.sunData.sunset)).pipe(
           switchMap(() => concat(
-            of(lightOff(LIVING_ROOM_LIGHT_ONE)),
+            of(lightOff(LIVING_ROOM_LIGHT_ONE, MINUTES_15_IN_SEC)),
             of(lightOn(
               LIVING_ROOM_LIGHT_TWO,
               {

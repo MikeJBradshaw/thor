@@ -3,7 +3,9 @@
     "@marblejs/core": "^4.1.0",
     "@marblejs/http": "^4.1.0",
     "@marblejs/middleware-body": "^4.1.0",
+    "@marblejs/middleware-cors": "^4.1.0",
     "@marblejs/middleware-logger": "^4.1.0",
+    "@marblejs/websockets": "^4.1.0",
     "@types/js-yaml": "^4.0.6",
     "@types/luxon": "^3.3.2",
     "@types/sqlite3": "^3.1.8",
@@ -25,7 +27,7 @@
     "typescript": "^5.1.6"
   },
   "name": "VALHALLA",
-  "version": "0.0.1",
+  "version": "0.0.2.1",
   "description": "Versatile Automation and Lifestyle Hub with Advanced Lighting and Logic Assistance (VALHALLA)",
   "main": "app.ts",
   "scripts": {
