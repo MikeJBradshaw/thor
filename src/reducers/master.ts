@@ -1,87 +1,57 @@
 import type { Reducer } from 'redux'
 
 import {
-  MASTER_BATH_BUTTON_CLICK,
-  MASTER_BATH_BUTTON_HOLD,
-  MASTER_BATH_BUTTON_RELEASE,
-  MASTER_BATH_MOTION_SENSOR
+  MASTER_BATH_CHANGE_GROUP_RED_LIGHT,
+  MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT,
+  MASTER_BATH_DISABLE_MANUAL,
+  MASTER_BATH_MOTION_SENSOR,
+  MASTER_BATH_OVERRIDE_SENSOR,
+  MASTER_BATH_SHOWER_TIMER,
+  MASTER_BATH_TIMER_EXPIRE
 } from 'actions/master'
-import {
-  BUTTON_STATE_DOUBLE,
-  ROOM_STATE_DEFAULT,
-  ROOM_STATE_SINGLE
-} from 'consts'
+import { BRIGHTNESS_OFF } from 'consts'
 import type { MasterAction } from 'actions/master'
-import type { ButtonPayload, MotionSensorPayload } from 'types/payloads'
 
 interface MasterState {
+  isRedLight: boolean
+  isWhiteLight: boolean
+  occupancy: boolean
+  group: { brightness: number }
   overrideMasterBathLights: boolean
   overrideMasterBathMotionSensor: boolean
-  roomState: string
-  motionSensorState: MotionSensorPayload
-  buttonState: ButtonPayload
 }
 
 const initState: MasterState = {
+  isRedLight: false,
+  isWhiteLight: false,
+  occupancy: false,
+  group: { brightness: BRIGHTNESS_OFF },
   overrideMasterBathLights: false,
-  overrideMasterBathMotionSensor: false,
-  roomState: ROOM_STATE_DEFAULT,
-  motionSensorState: {
-    battery: -1,
-    batteryLow: false,
-    occupancy: false
-  },
-  buttonState: {
-    action: '',
-    battery: -1,
-    linkquality: -1
-  }
+  overrideMasterBathMotionSensor: false
 }
 
 const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, action) => {
   switch (action.type) {
-    case MASTER_BATH_BUTTON_CLICK: {
-      const roomState = state.roomState
-      const buttonAction = action.payload.action
+    case MASTER_BATH_CHANGE_GROUP_RED_LIGHT:
+      return { ...state, isRedLight: true, isWhiteLight: false }
 
-      // double click not supported
-      if (buttonAction === BUTTON_STATE_DOUBLE) {
-        return state
-      }
+    case MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT:
+      return { ...state, isRedLight: false, isWhiteLight: true }
 
-      // button click single and room state already single -> default
-      if (roomState === ROOM_STATE_SINGLE) {
-        return {
-          ...state,
-          overrideMasterBathMotionSensor: false,
-          roomState: ROOM_STATE_DEFAULT,
-          buttonState: action.payload
-        }
-      }
+    case MASTER_BATH_DISABLE_MANUAL:
+      return { ...state, overrideMasterBathMotionSensor: false, overrideMasterBathLights: false }
 
-      // button click single and room state default -> single
-      return {
-        ...state,
-        overrideMasterBathMotionSensor: true,
-        roomState: ROOM_STATE_SINGLE,
-        buttonState: action.payload
-      }
-    }
+    case MASTER_BATH_MOTION_SENSOR:
+      return { ...state, occupancy: true }
 
-    case MASTER_BATH_BUTTON_HOLD: {
-      return { ...state, overrideMasterBathMotionSensor: true, buttonState: action.payload }
-    }
+    case MASTER_BATH_OVERRIDE_SENSOR:
+      return { ...state, overrideMasterBathLights: true, overrideMasterBathMotionSensor: true }
 
-    case MASTER_BATH_BUTTON_RELEASE: {
-      return { ...state, overrideMasterBathMotionSensor: false, buttonState: action.payload }
-    }
+    case MASTER_BATH_SHOWER_TIMER:
+      return { ...state, overrideMasterBathLights: true, overrideMasterBathMotionSensor: true }
 
-    case MASTER_BATH_MOTION_SENSOR: {
-      return {
-        ...state,
-        motionSensorState: action.payload
-      }
-    }
+    case MASTER_BATH_TIMER_EXPIRE:
+      return { ...state, overrideMasterBathLights: false, overrideMasterBathMotionSensor: false }
 
     default:
       return state

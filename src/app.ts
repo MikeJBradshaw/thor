@@ -1,9 +1,7 @@
 import { connect } from 'mqtt'
-import { createServer, httpListener } from '@marblejs/http'
-import { logger$ } from '@marblejs/middleware-logger'
-import { bodyParser$ } from '@marblejs/middleware-body'
-import type { MqttClient } from 'mqtt'
+import { webSocketListener, createWebSocketServer } from '@marblejs/websockets'
 import type { IO } from 'fp-ts/lib/IO'
+import type { MqttClient } from 'mqtt'
 
 import {
   bedroomOneButtonClick,
@@ -17,15 +15,18 @@ import {
   guestBathButtonRelease,
   guestBathMotionSensor
 } from 'actions/guestBath'
-import {
-  masterBathButtonClick,
-  masterBathButtonHold,
-  masterBathButtonRelease,
-  masterBathMotionSensor
-} from 'actions/master'
+import { masterBathMotionSensor } from 'actions/master'
 import { livingRoomButtonClick } from 'actions/livingRoom'
 import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
 import { supervisorInit } from 'actions/supervisor'
+import {
+  getEntities,
+  masterBathChangeRedLight,
+  masterBathChangeWhiteLight,
+  masterBathNormal,
+  masterBathManual,
+  masterBathShower
+} from 'websocket/effects'
 import {
   BEDROOM_ONE,
   BUTTON,
@@ -43,8 +44,8 @@ import {
   TEMP_HUMIDITY,
   TEST
 } from 'consts'
-import v1$ from 'routes'
 import store from 'store'
+import config from 'configuration.json'
 
 global.fetch = fetch
 
@@ -140,23 +141,6 @@ export const masterBathRouter = (device: string, buffer: Buffer): void => {
   const data = JSON.parse(buffer.toString())
   if (device === MOTION_SENSOR) {
     store.dispatch(masterBathMotionSensor(data))
-    return
-  }
-
-  if (device === BUTTON) {
-    switch (data.action) {
-      case BUTTON_STATE_SINGLE:
-      case BUTTON_STATE_DOUBLE:
-        store.dispatch(masterBathButtonClick(data))
-        return
-
-      case BUTTON_STATE_HOLD:
-        store.dispatch(masterBathButtonHold(data))
-        return
-
-      case BUTTON_STATE_RELEASE:
-        store.dispatch(masterBathButtonRelease(data))
-    }
   }
 }
 
@@ -236,17 +220,29 @@ store.subscribe(() => {
 /****************
  * MARBLE
  * *************/
-const middlewares = [logger$(), bodyParser$()]
-const server = createServer({
-  listener: httpListener({ middlewares, effects: [v1$] }),
-  hostname: '0.0.0.0',
-  port: 3001
-})
+if (config.websocketServer !== undefined) {
+  const effects = [
+    getEntities,
+    masterBathChangeRedLight,
+    masterBathChangeWhiteLight,
+    masterBathNormal,
+    masterBathManual,
+    masterBathShower
+  ]
 
-const main: IO<void> = async () => await (await server)()
+  const { host, port } = config.websocketServer
+  const webSocketServer = createWebSocketServer({
+    options: { port, host },
+    listener: webSocketListener({ effects })
+  })
 
-main()
+  const wsMain: IO<void> = async () => await (await webSocketServer)()
+  wsMain()
+}
 
+/***************
+ * PROCESS HANDLERS
+ * ************/
 process.on('SIGINT', () => {
   console.log('\nCAUGHT SHUTDOWN SIGNAL, SHUTTING DOWN...')
   // future messaging that its going down

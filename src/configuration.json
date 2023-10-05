@@ -4,5 +4,9 @@
     "fileName": "./valhalla.db3",
     "retention": 7
   },
+  "websocketServer": {
+    "host": "192.168.86.26",
+    "port": 1337
+  },
   "z2mConfigLocation": "/opt/zigbee2mqtt/data/configuration.yaml"
 }

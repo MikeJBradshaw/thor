@@ -4,30 +4,28 @@ import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
   LIGHTS_GROUP,
-  MASTER_BATH_BUTTON_CLICK,
-  MASTER_BATH_BUTTON_HOLD,
-  MASTER_BATH_BUTTON_RELEASE,
+  MASTER_BATH_CHANGE_GROUP_RED_LIGHT,
+  MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT,
+  MASTER_BATH_DISABLE_MANUAL,
   MASTER_BATH_MOTION_SENSOR,
-  MASTER_BATH_TIMER,
-  masterBathTimer,
+  MASTER_BATH_SHOWER_TIMER,
+  masterBathShowerTimer,
   masterBathTimerExpire
 } from 'actions/master'
 import { lightOn, lightOff, noop } from 'actions/mqttClient'
 import {
   BRIGHTNESS_HIGH,
   BRIGHTNESS_LOW,
-  BUTTON_STATE_SINGLE,
   COLOR_TEMP_NEUTRAL,
-  COLOR_RED_HEX,
-  ROOM_STATE_DEFAULT
+  COLOR_RED_HEX
 } from 'consts'
 import type { RootState } from 'store'
 import type {
-  MasterBathButtonClickAction,
-  MasterBathButtonHoldAction,
-  MasterBathButtonReleaseAction,
+  MasterBathChangeGroupRedLightAction,
+  MasterBathChangeGroupWhiteLightAction,
+  MasterBathDisableManualAction,
   MasterBathMotionSensorAction,
-  MasterBathTimerAction,
+  MasterBathShowerTimerAction,
   MasterBathTimerExpireAction
 } from 'actions/master'
 import type { LightOn, LightOff, Noop } from 'actions/mqttClient'
@@ -65,72 +63,31 @@ const motionSensorEpic = (
   })
 )
 
-type ButtonHoldEpicReturnType = Observable<LightOn>
-const buttonHoldEpic = (
-  action$: Observable<MasterBathButtonHoldAction>,
-  state$: StateObservable<RootState>
-): ButtonHoldEpicReturnType => action$.pipe(
-  ofType(MASTER_BATH_BUTTON_HOLD),
-  switchMap(() => of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL })))
+const websocketChangeRedLightEpic = (
+  action$: Observable<MasterBathChangeGroupRedLightAction>
+): Observable<LightOn> => action$.pipe(
+  ofType(MASTER_BATH_CHANGE_GROUP_RED_LIGHT),
+  map(() => lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color: { hex: COLOR_RED_HEX } }))
 )
 
-type ButtonReleaseEpicReturnType = Observable<LightOn>
-const buttonReleaseEpic = (
-  action$: Observable<MasterBathButtonReleaseAction>,
-  state$: StateObservable<RootState>
-): ButtonReleaseEpicReturnType => action$.pipe(
-  ofType(MASTER_BATH_BUTTON_RELEASE),
-  switchMap(() => {
-    const date = new Date().toLocaleTimeString('en', { hour12: false })
-
-    if (isNight(date)) {
-      return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }))
-    }
-
-    return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
-  })
+const websocketChangeWhiteLightEpic = (
+  action$: Observable<MasterBathChangeGroupWhiteLightAction>
+): Observable<LightOn> => action$.pipe(
+  ofType(MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT),
+  map(() => lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
 )
 
-type ButtonClickEpicReturnType = Observable<LightOn | MasterBathTimerAction | MasterBathTimerExpireAction | Noop>
-const buttonClickEpic = (
-  action$: Observable<MasterBathButtonClickAction | MasterBathTimerExpireAction>,
-  state$: StateObservable<RootState>
-): ButtonClickEpicReturnType => action$.pipe(
-  ofType(MASTER_BATH_BUTTON_CLICK),
-  switchMap(() => {
-    const buttonAction = state$.value.masterReducer.buttonState.action
-    const roomState = state$.value.masterReducer.roomState
-    if (buttonAction === BUTTON_STATE_SINGLE) {
-      if (roomState === ROOM_STATE_DEFAULT) {
-        // if default, we need to kill the single click timer
-        return of(masterBathTimerExpire())
-      }
-      // need to turn lights on and start a timer
-      return of(
-        lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }),
-        masterBathTimer()
-      )
-    }
-
-    // we dont handle double click right now
-    return of(noop())
-  })
-)
-
-const masterTimerEpic = (
-  action$: Observable<MasterBathTimerAction | MasterBathButtonClickAction>
+const websocketShowerTimerEpic = (
+  action$: Observable<MasterBathShowerTimerAction | MasterBathDisableManualAction>
 ): Observable<MasterBathTimerExpireAction> => action$.pipe(
-  ofType(MASTER_BATH_TIMER),
-  switchMap(() => timer(1000 * 60 * 1).pipe(
-    map(() => masterBathTimerExpire())
-  )),
-  takeUntil(action$.pipe(ofType(MASTER_BATH_BUTTON_CLICK)))
+  ofType(MASTER_BATH_SHOWER_TIMER),
+  switchMap(() => timer(1000 * 60 * 1).pipe(map(() => masterBathTimerExpire()))),
+  takeUntil(action$.pipe(ofType(MASTER_BATH_DISABLE_MANUAL)))
 )
 
 export default combineEpics(
-  buttonClickEpic as any,
-  buttonHoldEpic as any,
-  buttonReleaseEpic as any,
   motionSensorEpic as any,
-  masterTimerEpic as any
+  websocketChangeRedLightEpic as any,
+  websocketChangeWhiteLightEpic as any,
+  websocketShowerTimerEpic as any,
 )
