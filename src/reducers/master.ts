@@ -39,19 +39,15 @@ const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, ac
       return { ...state, isRedLight: false, isWhiteLight: true }
 
     case MASTER_BATH_DISABLE_MANUAL:
+    case MASTER_BATH_TIMER_EXPIRE:
       return { ...state, overrideMasterBathMotionSensor: false, overrideMasterBathLights: false }
 
     case MASTER_BATH_MOTION_SENSOR:
-      return { ...state, occupancy: true }
+      return { ...state, occupancy: action.payload.occupancy }
 
     case MASTER_BATH_OVERRIDE_SENSOR:
-      return { ...state, overrideMasterBathLights: true, overrideMasterBathMotionSensor: true }
-
     case MASTER_BATH_SHOWER_TIMER:
       return { ...state, overrideMasterBathLights: true, overrideMasterBathMotionSensor: true }
-
-    case MASTER_BATH_TIMER_EXPIRE:
-      return { ...state, overrideMasterBathLights: false, overrideMasterBathMotionSensor: false }
 
     default:
       return state

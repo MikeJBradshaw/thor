@@ -9,6 +9,7 @@ import {
   MASTER_BATH_DISABLE_MANUAL,
   MASTER_BATH_MOTION_SENSOR,
   MASTER_BATH_SHOWER_TIMER,
+  MASTER_BATH_TIMER_EXPIRE,
   masterBathShowerTimer,
   masterBathTimerExpire
 } from 'actions/master'
@@ -17,7 +18,9 @@ import {
   BRIGHTNESS_HIGH,
   BRIGHTNESS_LOW,
   COLOR_TEMP_NEUTRAL,
-  COLOR_RED_HEX
+  COLOR_RED_HEX,
+  MINUTES_20_IN_MSEC,
+  SECONDS_5
 } from 'consts'
 import type { RootState } from 'store'
 import type {
@@ -63,6 +66,19 @@ const motionSensorEpic = (
   })
 )
 
+const timerExpireEpic = (
+  action$: Observable<MasterBathTimerExpireAction>,
+  state$: StateObservable<RootState>
+): Observable<LightOff | Noop> => action$.pipe(
+  ofType(MASTER_BATH_TIMER_EXPIRE),
+  switchMap(() => {
+    if (state$.value.masterReducer.occupancy) {
+      return of(noop())
+    }
+    return of(lightOff(LIGHTS_GROUP, SECONDS_5))
+  })
+)
+
 const websocketChangeRedLightEpic = (
   action$: Observable<MasterBathChangeGroupRedLightAction>
 ): Observable<LightOn> => action$.pipe(
@@ -81,13 +97,14 @@ const websocketShowerTimerEpic = (
   action$: Observable<MasterBathShowerTimerAction | MasterBathDisableManualAction>
 ): Observable<MasterBathTimerExpireAction> => action$.pipe(
   ofType(MASTER_BATH_SHOWER_TIMER),
-  switchMap(() => timer(1000 * 60 * 1).pipe(map(() => masterBathTimerExpire()))),
+  switchMap(() => timer(MINUTES_20_IN_MSEC).pipe(map(() => masterBathTimerExpire()))),
   takeUntil(action$.pipe(ofType(MASTER_BATH_DISABLE_MANUAL)))
 )
 
 export default combineEpics(
   motionSensorEpic as any,
+  timerExpireEpic as any,
   websocketChangeRedLightEpic as any,
   websocketChangeWhiteLightEpic as any,
-  websocketShowerTimerEpic as any,
+  websocketShowerTimerEpic as any
 )
