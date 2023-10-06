@@ -26,7 +26,7 @@ import { DBEngine } from 'database/engine'
 import { GET_ALL_ENTITIES } from 'sql'
 import type { Entity } from 'websocket/events'
 import store from 'store'
-import config from 'configuration.json'
+import config from '../../configuration.json'
 
 const { type, fileName } = config.database
 const engine = new DBEngine(type === 'file' ? fileName : ':memory:')

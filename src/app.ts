@@ -45,7 +45,7 @@ import {
   TEST
 } from 'consts'
 import store from 'store'
-import config from 'configuration.json'
+import config from '../configuration.json'
 
 global.fetch = fetch
 

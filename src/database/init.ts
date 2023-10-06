@@ -5,7 +5,7 @@ import { readFileSync } from 'fs'
 
 import { ENTITIES, PRODUCTION, TEST } from 'consts'
 import type { Z2mConfigYaml } from 'types/external'
-import config from 'configuration.json'
+import config from '../../configuration.json'
 
 const TMP_CONFIG_FILE = 'config.tmp.yaml'
 
