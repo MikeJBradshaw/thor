@@ -40,6 +40,10 @@ export const MASTER_BATH_TIMER_EXPIRE = 'MASTER_BATH_TIMER_EXPIRE'
 export interface MasterBathTimerExpireAction { type: typeof MASTER_BATH_TIMER_EXPIRE }
 export const masterBathTimerExpire = (): MasterBathTimerExpireAction => ({ type: MASTER_BATH_TIMER_EXPIRE })
 
+export const MASTER_BATH_UPDATE_STATE = 'MASTER_BATH_UPDATE_STATE'
+export interface MasterBathUpdateStateAction { type: typeof MASTER_BATH_UPDATE_STATE }
+export const masterBathUpdateState = (): MasterBathUpdateStateAction => ({ type: MASTER_BATH_UPDATE_STATE })
+
 export type MasterAction = MasterBathChangeGroupRedLightAction
 | MasterBathChangeGroupWhiteLightAction
 | MasterBathDisableManualAction
@@ -47,3 +51,4 @@ export type MasterAction = MasterBathChangeGroupRedLightAction
 | MasterBathOverrideSensorAction
 | MasterBathShowerTimerAction
 | MasterBathTimerExpireAction
+| MasterBathUpdateStateAction

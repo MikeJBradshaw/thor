@@ -12,7 +12,7 @@ import {
 import { BRIGHTNESS_OFF } from 'consts'
 import type { MasterAction } from 'actions/master'
 
-interface MasterState {
+export interface MasterState {
   isRedLight: boolean
   isWhiteLight: boolean
   occupancy: boolean

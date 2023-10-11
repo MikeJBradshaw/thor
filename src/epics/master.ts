@@ -10,8 +10,8 @@ import {
   MASTER_BATH_MOTION_SENSOR,
   MASTER_BATH_SHOWER_TIMER,
   MASTER_BATH_TIMER_EXPIRE,
-  masterBathShowerTimer,
-  masterBathTimerExpire
+  masterBathTimerExpire,
+  masterBathUpdateState
 } from 'actions/master'
 import { lightOn, lightOff, noop } from 'actions/mqttClient'
 import {
@@ -31,6 +31,7 @@ import type {
   MasterBathShowerTimerAction,
   MasterBathTimerExpireAction
 } from 'actions/master'
+import { stateUpdateSubject } from 'websocket/masterBathEffects'
 import type { LightOn, LightOff, Noop } from 'actions/mqttClient'
 
 const DAY_END = '20:30:00'
@@ -44,6 +45,7 @@ const motionSensorEpic = (
   state$: StateObservable<RootState>
 ): MotionSensorEpicReturnType => action$.pipe(
   ofType(MASTER_BATH_MOTION_SENSOR),
+  // broadcast(websocketClient, wsUpdateState),
   switchMap(({ payload: { occupancy } }) => {
     if (
       state$.value.masterReducer.overrideMasterBathLights ||
@@ -101,10 +103,24 @@ const websocketShowerTimerEpic = (
   takeUntil(action$.pipe(ofType(MASTER_BATH_DISABLE_MANUAL)))
 )
 
+type StateUpdateAction = MasterBathChangeGroupRedLightAction
+| MasterBathChangeGroupWhiteLightAction
+const websocketUpdateStateEpic = (action$: Observable<StateUpdateAction>): Observable<Noop> => action$.pipe(
+  ofType(
+    MASTER_BATH_CHANGE_GROUP_RED_LIGHT,
+    MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT
+  ),
+  map(() => {
+    stateUpdateSubject.next(masterBathUpdateState())
+    return noop()
+  })
+)
+
 export default combineEpics(
   motionSensorEpic as any,
   timerExpireEpic as any,
   websocketChangeRedLightEpic as any,
   websocketChangeWhiteLightEpic as any,
-  websocketShowerTimerEpic as any
+  websocketShowerTimerEpic as any,
+  websocketUpdateStateEpic as any
 )

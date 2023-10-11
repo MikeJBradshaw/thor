@@ -20,14 +20,6 @@ import { livingRoomButtonClick } from 'actions/livingRoom'
 import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
 import { supervisorInit } from 'actions/supervisor'
 import {
-  getEntities,
-  masterBathChangeRedLight,
-  masterBathChangeWhiteLight,
-  masterBathNormal,
-  masterBathManual,
-  masterBathShower
-} from 'websocket/effects'
-import {
   BEDROOM_ONE,
   BUTTON,
   BUTTON_STATE_DOUBLE,
@@ -44,6 +36,8 @@ import {
   TEMP_HUMIDITY,
   TEST
 } from 'consts'
+import websocketEffects from 'websocket/websocketEffects'
+import masterBathEffects from 'websocket/masterBathEffects'
 import store from 'store'
 import config from '../configuration.json'
 
@@ -222,12 +216,8 @@ store.subscribe(() => {
  * *************/
 if (config.websocketServer !== undefined) {
   const effects = [
-    getEntities,
-    masterBathChangeRedLight,
-    masterBathChangeWhiteLight,
-    masterBathNormal,
-    masterBathManual,
-    masterBathShower
+    ...websocketEffects,
+    ...masterBathEffects
   ]
 
   const { host, port } = config.websocketServer

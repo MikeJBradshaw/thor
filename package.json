@@ -2,9 +2,6 @@
   "dependencies": {
     "@marblejs/core": "^4.1.0",
     "@marblejs/http": "^4.1.0",
-    "@marblejs/middleware-body": "^4.1.0",
-    "@marblejs/middleware-cors": "^4.1.0",
-    "@marblejs/middleware-logger": "^4.1.0",
     "@marblejs/websockets": "^4.1.0",
     "@types/js-yaml": "^4.0.6",
     "@types/luxon": "^3.3.2",
@@ -22,7 +19,7 @@
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "@types/node": "^20.4.9",
+    "@types/ws": "^8.5.6",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6"
   },
@@ -36,5 +33,9 @@
     "start": "ts-node ./src/app.ts"
   },
   "author": "Mike Bradshaw",
-  "license": "ISC"
+  "license": "ISC",
+  "optionalDependencies": {
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10"
+  }
 }
