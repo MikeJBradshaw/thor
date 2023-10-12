@@ -1,17 +1,18 @@
 import { Observable, of, timer } from 'rxjs'
-import { switchMap, map, takeUntil } from 'rxjs/operators'
+import { switchMap, map, repeat, takeUntil } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
   LIGHTS_GROUP,
-  MASTER_BATH_CHANGE_GROUP_RED_LIGHT,
-  MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT,
-  MASTER_BATH_DISABLE_MANUAL,
+  CHANGE_GROUP_RED_LIGHT,
+  CHANGE_GROUP_WHITE_LIGHT,
   MASTER_BATH_MOTION_SENSOR,
-  MASTER_BATH_SHOWER_TIMER,
-  MASTER_BATH_TIMER_EXPIRE,
-  masterBathTimerExpire,
-  masterBathUpdateState
+  UPDATE_MANUAL_PROFILE,
+  UPDATE_SENSOR_PROFILE,
+  UPDATE_SHOWER_TIMER,
+  UPDATE_TIMER_EXPIRE,
+  updateTimerExpire,
+  updateState
 } from 'actions/master'
 import { lightOn, lightOff, noop } from 'actions/mqttClient'
 import {
@@ -24,12 +25,13 @@ import {
 } from 'consts'
 import type { RootState } from 'store'
 import type {
-  MasterBathChangeGroupRedLightAction,
-  MasterBathChangeGroupWhiteLightAction,
-  MasterBathDisableManualAction,
+  ChangeGroupRedLightAction,
+  ChangeGroupWhiteLightAction,
   MasterBathMotionSensorAction,
-  MasterBathShowerTimerAction,
-  MasterBathTimerExpireAction
+  UpdateManualProfileAction,
+  UpdateSensorProfileAction,
+  UpdateShowerTimerAction,
+  UpdateTimerExpireAction
 } from 'actions/master'
 import { stateUpdateSubject } from 'websocket/masterBathEffects'
 import type { LightOn, LightOff, Noop } from 'actions/mqttClient'
@@ -47,10 +49,7 @@ const motionSensorEpic = (
   ofType(MASTER_BATH_MOTION_SENSOR),
   // broadcast(websocketClient, wsUpdateState),
   switchMap(({ payload: { occupancy } }) => {
-    if (
-      state$.value.masterReducer.overrideMasterBathLights ||
-      state$.value.masterReducer.overrideMasterBathMotionSensor
-    ) {
+    if (state$.value.masterReducer.isProfileManual) {
       return of(noop())
     } else {
       if (occupancy) {
@@ -69,10 +68,10 @@ const motionSensorEpic = (
 )
 
 const timerExpireEpic = (
-  action$: Observable<MasterBathTimerExpireAction>,
+  action$: Observable<UpdateTimerExpireAction>,
   state$: StateObservable<RootState>
 ): Observable<LightOff | Noop> => action$.pipe(
-  ofType(MASTER_BATH_TIMER_EXPIRE),
+  ofType(UPDATE_TIMER_EXPIRE),
   switchMap(() => {
     if (state$.value.masterReducer.occupancy) {
       return of(noop())
@@ -82,36 +81,45 @@ const timerExpireEpic = (
 )
 
 const websocketChangeRedLightEpic = (
-  action$: Observable<MasterBathChangeGroupRedLightAction>
+  action$: Observable<ChangeGroupRedLightAction>
 ): Observable<LightOn> => action$.pipe(
-  ofType(MASTER_BATH_CHANGE_GROUP_RED_LIGHT),
+  ofType(CHANGE_GROUP_RED_LIGHT),
   map(() => lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color: { hex: COLOR_RED_HEX } }))
 )
 
 const websocketChangeWhiteLightEpic = (
-  action$: Observable<MasterBathChangeGroupWhiteLightAction>
+  action$: Observable<ChangeGroupWhiteLightAction>
 ): Observable<LightOn> => action$.pipe(
-  ofType(MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT),
+  ofType(CHANGE_GROUP_WHITE_LIGHT),
   map(() => lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
 )
 
 const websocketShowerTimerEpic = (
-  action$: Observable<MasterBathShowerTimerAction | MasterBathDisableManualAction>
-): Observable<MasterBathTimerExpireAction> => action$.pipe(
-  ofType(MASTER_BATH_SHOWER_TIMER),
-  switchMap(() => timer(MINUTES_20_IN_MSEC).pipe(map(() => masterBathTimerExpire()))),
-  takeUntil(action$.pipe(ofType(MASTER_BATH_DISABLE_MANUAL)))
+  action$: Observable<UpdateShowerTimerAction | UpdateSensorProfileAction>
+): Observable<UpdateTimerExpireAction> => action$.pipe(
+  ofType(UPDATE_SHOWER_TIMER),
+  switchMap(() => timer(5000).pipe(map(() => updateTimerExpire()))),
+  takeUntil(action$.pipe(ofType(UPDATE_SENSOR_PROFILE))),
+  repeat()
 )
 
-type StateUpdateAction = MasterBathChangeGroupRedLightAction
-| MasterBathChangeGroupWhiteLightAction
+type StateUpdateAction = ChangeGroupRedLightAction
+| ChangeGroupWhiteLightAction
+| UpdateManualProfileAction
+| UpdateSensorProfileAction
+| UpdateShowerTimerAction
+| UpdateTimerExpireAction
 const websocketUpdateStateEpic = (action$: Observable<StateUpdateAction>): Observable<Noop> => action$.pipe(
   ofType(
-    MASTER_BATH_CHANGE_GROUP_RED_LIGHT,
-    MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT
+    CHANGE_GROUP_RED_LIGHT,
+    CHANGE_GROUP_WHITE_LIGHT,
+    UPDATE_MANUAL_PROFILE,
+    UPDATE_SENSOR_PROFILE,
+    UPDATE_SHOWER_TIMER,
+    UPDATE_TIMER_EXPIRE
   ),
   map(() => {
-    stateUpdateSubject.next(masterBathUpdateState())
+    stateUpdateSubject.next(updateState())
     return noop()
   })
 )

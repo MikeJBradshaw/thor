@@ -7,86 +7,86 @@ import type { WsEffect } from '@marblejs/websockets'
 import {
   MASTER_BATH_INIT,
   MASTER_BATH_UPDATE_PROFILE_MANUAL,
-  MASTER_BATH_UPDATE_PROFILE_NORMAL,
+  MASTER_BATH_UPDATE_PROFILE_SENSOR,
   MASTER_BATH_UPDATE_PROFILE_SHOWER,
-  wsUpdateState,
-  wsNoop
+  wsUpdateMasterBathState,
+  wsAck
 } from 'websocket/translations'
 import {
-  MASTER_BATH_CHANGE_GROUP_RED_LIGHT,
-  MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT,
-  MASTER_BATH_UPDATE_STATE,
-  masterBathChangeGroupRedLight,
-  masterBathChangeGroupWhiteLight,
-  masterBathDisableManual,
-  masterBathOverrideSensor,
-  masterBathShowerTimer
+  CHANGE_GROUP_RED_LIGHT,
+  CHANGE_GROUP_WHITE_LIGHT,
+  UPDATE_STATE,
+  changeGroupRedLight,
+  changeGroupWhiteLight,
+  updateManualProfile,
+  updateSensorProfile,
+  updateShowerTimer
 } from 'actions/master'
-import type { MasterBathUpdateStateAction } from 'actions/master'
+import type { UpdateStateAction } from 'actions/master'
 import store from 'store'
 
-type WebsocketUpdateStateAction = MasterBathUpdateStateAction
+type WebsocketUpdateStateAction = UpdateStateAction
 export const stateUpdateSubject = new Subject<WebsocketUpdateStateAction>()
 
 export const init: WsEffect = event$ => event$.pipe(
   matchEvent(MASTER_BATH_INIT),
-  switchMap(() => of(wsUpdateState(store.getState().masterReducer)))
+  switchMap(() => of(wsUpdateMasterBathState(store.getState().masterReducer)))
+)
+
+export const changeRedLight: WsEffect = event$ => event$.pipe(
+  matchEvent(CHANGE_GROUP_RED_LIGHT),
+  map(() => {
+    store.dispatch(changeGroupRedLight())
+    return wsAck()
+  })
+)
+
+export const changeWhiteLight: WsEffect = event$ => event$.pipe(
+  matchEvent(CHANGE_GROUP_WHITE_LIGHT),
+  map(() => {
+    store.dispatch(changeGroupWhiteLight())
+    return wsAck()
+  })
+)
+
+export const manualProfile: WsEffect = event$ => event$.pipe(
+  matchEvent(MASTER_BATH_UPDATE_PROFILE_MANUAL),
+  map(() => {
+    store.dispatch(updateManualProfile())
+    return wsAck()
+  })
+)
+
+export const sensorProfile: WsEffect = event$ => event$.pipe(
+  matchEvent(MASTER_BATH_UPDATE_PROFILE_SENSOR),
+  map(() => {
+    store.dispatch(updateSensorProfile())
+    return wsAck()
+  })
+)
+
+export const showerProfile: WsEffect = event$ => event$.pipe(
+  matchEvent(MASTER_BATH_UPDATE_PROFILE_SHOWER),
+  map(() => {
+    store.dispatch(updateShowerTimer())
+    return wsAck()
+  })
 )
 
 export const updateState: WsEffect = event$ => event$.pipe(
   matchEvent(MASTER_BATH_INIT),
   switchMap(() => stateUpdateSubject.pipe(
-    ofType(MASTER_BATH_UPDATE_STATE),
-    map(() => wsUpdateState(store.getState().masterReducer))
+    ofType(UPDATE_STATE),
+    map(() => wsUpdateMasterBathState(store.getState().masterReducer))
   ))
-)
-
-export const changeRedLight: WsEffect = event$ => event$.pipe(
-  matchEvent(MASTER_BATH_CHANGE_GROUP_RED_LIGHT),
-  map(() => {
-    store.dispatch(masterBathChangeGroupRedLight())
-    return wsNoop()
-  })
-)
-
-export const changeWhiteLight: WsEffect = event$ => event$.pipe(
-  matchEvent(MASTER_BATH_CHANGE_GROUP_WHITE_LIGHT),
-  map(() => {
-    store.dispatch(masterBathChangeGroupWhiteLight())
-    return wsNoop()
-  })
-)
-
-export const masterBathNormal: WsEffect = event$ => event$.pipe(
-  matchEvent(MASTER_BATH_UPDATE_PROFILE_NORMAL),
-  map(() => {
-    store.dispatch(masterBathDisableManual())
-    return wsNoop()
-  })
-)
-
-export const masterBathManual: WsEffect = event$ => event$.pipe(
-  matchEvent(MASTER_BATH_UPDATE_PROFILE_MANUAL),
-  map(() => {
-    store.dispatch(masterBathOverrideSensor())
-    return wsNoop()
-  })
-)
-
-export const masterBathShower: WsEffect = event$ => event$.pipe(
-  matchEvent(MASTER_BATH_UPDATE_PROFILE_SHOWER),
-  map(() => {
-    store.dispatch(masterBathShowerTimer())
-    return wsNoop()
-  })
 )
 
 export default [
   init,
-  updateState,
   changeRedLight,
   changeWhiteLight,
-  masterBathNormal,
-  masterBathManual,
-  masterBathShower
+  manualProfile,
+  sensorProfile,
+  showerProfile,
+  updateState
 ]
