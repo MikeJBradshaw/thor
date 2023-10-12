@@ -98,7 +98,7 @@ const websocketShowerTimerEpic = (
   action$: Observable<UpdateShowerTimerAction | UpdateSensorProfileAction>
 ): Observable<UpdateTimerExpireAction> => action$.pipe(
   ofType(UPDATE_SHOWER_TIMER),
-  switchMap(() => timer(5000).pipe(map(() => updateTimerExpire()))),
+  switchMap(() => timer(MINUTES_20_IN_MSEC).pipe(map(() => updateTimerExpire()))),
   takeUntil(action$.pipe(ofType(UPDATE_SENSOR_PROFILE))),
   repeat()
 )
