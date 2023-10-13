@@ -44,6 +44,7 @@ export const HOURS_24_IN_MSEC = 86400000
 export const MINUTES_1_IN_MSEC = 60000
 export const MINUTES_2_IN_MSEC = 120000
 export const MINUTES_5_IN_MSEC = 300000
+export const MINUTES_10_IN_MSEC = 600000
 export const MINUTES_20_IN_MSEC = 1200000
 export const MINUTES_15_IN_SEC = 900
 export const MINUTES_30_IN_SEC = 1800

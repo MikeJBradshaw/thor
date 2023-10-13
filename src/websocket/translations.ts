@@ -1,7 +1,8 @@
 import type { MasterState } from 'reducers/master'
 export const APP_INIT = 'APP_INIT'
 export const MASTER_BATH_INIT = 'MASTER_BATH_INIT'
-
+export const HEARTBEAT_START = 'SERVER_HEARTBEAT'
+export const CLIENT_HEARTBEAT = 'CLIENT_HEARTBEAT'
 export const MASTER_BATH_UPDATE_PROFILE_MANUAL = 'MASTER_BATH_UPDATE_PROFILE_MANUAL'
 export const MASTER_BATH_UPDATE_PROFILE_SENSOR = 'MASTER_BATH_UPDATE_PROFILE_SENSOR'
 export const MASTER_BATH_UPDATE_PROFILE_SHOWER = 'MASTER_BATH_UPDATE_PROFILE_SHOWER'
@@ -20,3 +21,7 @@ export const wsUpdateEntities = (data: Entity[]): WSUpdateEntitiesEvent => ({ ty
 export const WS_ACK = 'WS_ACK'
 export interface WSAck { type: typeof WS_ACK }
 export const wsAck = (): WSAck => ({ type: WS_ACK })
+
+export const WS_HEARTBEAT = 'WS_HEARTBEAT'
+export interface WSHeartbeatEvent { type: typeof WS_HEARTBEAT }
+export const wsHeartbeat = (): WSHeartbeatEvent => ({ type: WS_HEARTBEAT })

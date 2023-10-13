@@ -1,11 +1,12 @@
 import { matchEvent } from '@marblejs/core'
-import { concatMap, catchError, map } from 'rxjs/operators'
-import { from, of } from 'rxjs'
-import { APP_INIT, wsUpdateEntities } from 'websocket/translations'
+import { concatMap, catchError, map, repeat, switchMap, takeUntil } from 'rxjs/operators'
+import { from, of, timer } from 'rxjs'
 import type { WsEffect } from '@marblejs/websockets'
 
 import { DBEngine } from 'database/engine'
 import { GET_ALL_ENTITIES } from 'sql'
+import { APP_INIT, CLIENT_HEARTBEAT, HEARTBEAT_START, wsUpdateEntities, wsHeartbeat } from 'websocket/translations'
+import { MINUTES_10_IN_MSEC } from 'consts'
 import type { Entity } from 'websocket/translations'
 import config from '../../configuration.json'
 
@@ -23,4 +24,13 @@ export const getEntities: WsEffect = event$ => event$.pipe(
   })
 )
 
-export default [getEntities]
+export const heartbeat: WsEffect = event$ => event$.pipe(
+  matchEvent(CLIENT_HEARTBEAT),
+  switchMap(() => timer(MINUTES_10_IN_MSEC).pipe(
+    map(() => wsHeartbeat()),
+    takeUntil(event$.pipe(matchEvent(CLIENT_HEARTBEAT))),
+    repeat()
+  ))
+)
+
+export default [getEntities, heartbeat]
