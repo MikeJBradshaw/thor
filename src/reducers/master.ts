@@ -4,6 +4,7 @@ import {
   CHANGE_GROUP_RED_LIGHT,
   CHANGE_GROUP_WHITE_LIGHT,
   MASTER_BATH_MOTION_SENSOR,
+  UPDATE_BRIGHTNESS,
   UPDATE_MANUAL_PROFILE,
   UPDATE_SENSOR_PROFILE,
   UPDATE_SHOWER_TIMER,
@@ -54,6 +55,9 @@ const masterReducer: Reducer<MasterState, MasterAction> = (state = initState, ac
 
     case MASTER_BATH_MOTION_SENSOR:
       return { ...state, occupancy: action.payload.occupancy }
+
+    case UPDATE_BRIGHTNESS:
+      return { ...state, brightness: action.brightness }
 
     case UPDATE_MANUAL_PROFILE:
       return { ...state, isProfileSensor: false, isProfileManual: true, isProfileShower: false }

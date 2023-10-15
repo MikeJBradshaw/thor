@@ -2,6 +2,7 @@
   "dependencies": {
     "@marblejs/core": "^4.1.0",
     "@marblejs/http": "^4.1.0",
+    "@marblejs/middleware-io": "^4.1.0",
     "@marblejs/websockets": "^4.1.0",
     "@types/js-yaml": "^4.0.6",
     "@types/luxon": "^3.3.2",

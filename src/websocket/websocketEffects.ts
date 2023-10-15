@@ -5,7 +5,7 @@ import type { WsEffect } from '@marblejs/websockets'
 
 import { DBEngine } from 'database/engine'
 import { GET_ALL_ENTITIES } from 'sql'
-import { APP_INIT, CLIENT_HEARTBEAT, HEARTBEAT_START, wsUpdateEntities, wsHeartbeat } from 'websocket/translations'
+import { APP_INIT, CLIENT_HEARTBEAT, wsUpdateEntities, wsHeartbeat } from 'websocket/translations'
 import { MINUTES_10_IN_MSEC } from 'consts'
 import type { Entity } from 'websocket/translations'
 import config from '../../configuration.json'

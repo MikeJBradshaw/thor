@@ -20,6 +20,10 @@ export const masterBathMotionSensor = (
   payload: MotionSensorPayload
 ): MasterBathMotionSensorAction => ({ type: MASTER_BATH_MOTION_SENSOR, payload })
 
+export const UPDATE_BRIGHTNESS = 'MASTER_BATH_UPDATE_BRIGHTNESS'
+export interface UpdateBrightnessAction { type: typeof UPDATE_BRIGHTNESS, brightness: number }
+export const updateBrightness = (brightness: number): UpdateBrightnessAction => ({ type: UPDATE_BRIGHTNESS, brightness })
+
 export const UPDATE_MANUAL_PROFILE = 'MASTER_BATH_UPDATE_PROFILE_MANUAL'
 export interface UpdateManualProfileAction { type: typeof UPDATE_MANUAL_PROFILE }
 export const updateManualProfile = (): UpdateManualProfileAction => ({ type: UPDATE_MANUAL_PROFILE })
@@ -43,6 +47,7 @@ export const updateTimerExpire = (): UpdateTimerExpireAction => ({ type: UPDATE_
 export type MasterAction = ChangeGroupRedLightAction
 | ChangeGroupWhiteLightAction
 | MasterBathMotionSensorAction
+| UpdateBrightnessAction
 | UpdateManualProfileAction
 | UpdateSensorProfileAction
 | UpdateShowerTimerAction

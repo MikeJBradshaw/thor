@@ -7,10 +7,12 @@ import {
   CHANGE_GROUP_RED_LIGHT,
   CHANGE_GROUP_WHITE_LIGHT,
   MASTER_BATH_MOTION_SENSOR,
+  UPDATE_BRIGHTNESS,
   UPDATE_MANUAL_PROFILE,
   UPDATE_SENSOR_PROFILE,
   UPDATE_SHOWER_TIMER,
   UPDATE_TIMER_EXPIRE,
+  updateBrightness,
   updateTimerExpire,
   updateState
 } from 'actions/master'
@@ -28,6 +30,7 @@ import type {
   ChangeGroupRedLightAction,
   ChangeGroupWhiteLightAction,
   MasterBathMotionSensorAction,
+  UpdateBrightnessAction,
   UpdateManualProfileAction,
   UpdateSensorProfileAction,
   UpdateShowerTimerAction,
@@ -41,7 +44,7 @@ const DAY_START = '06:45:00'
 
 const isNight = (date: string): boolean => date >= DAY_END || date <= DAY_START
 
-type MotionSensorEpicReturnType = Observable<LightOn | LightOff | Noop>
+type MotionSensorEpicReturnType = Observable<LightOn | LightOff | Noop | UpdateBrightnessAction>
 const motionSensorEpic = (
   action$: Observable<MasterBathMotionSensorAction>,
   state$: StateObservable<RootState>
@@ -56,10 +59,16 @@ const motionSensorEpic = (
         const date = new Date().toLocaleTimeString('en', { hour12: false })
 
         if (isNight(date)) {
-          return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }))
+          return of(
+            lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } }),
+            updateBrightness(BRIGHTNESS_LOW)
+          )
         }
 
-        return of(lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
+        return of(
+          lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }),
+          updateBrightness(BRIGHTNESS_HIGH)
+        )
       }
 
       return of(lightOff(LIGHTS_GROUP))
@@ -81,17 +90,19 @@ const timerExpireEpic = (
 )
 
 const websocketChangeRedLightEpic = (
-  action$: Observable<ChangeGroupRedLightAction>
-): Observable<LightOn> => action$.pipe(
+  action$: Observable<ChangeGroupRedLightAction>,
+  state$: StateObservable<RootState>
+): Observable<LightOn | UpdateBrightnessAction> => action$.pipe(
   ofType(CHANGE_GROUP_RED_LIGHT),
-  map(() => lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color: { hex: COLOR_RED_HEX } }))
+  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterReducer.brightness, color: { hex: COLOR_RED_HEX } }))
 )
 
 const websocketChangeWhiteLightEpic = (
-  action$: Observable<ChangeGroupWhiteLightAction>
+  action$: Observable<ChangeGroupWhiteLightAction>,
+  state$: StateObservable<RootState>
 ): Observable<LightOn> => action$.pipe(
   ofType(CHANGE_GROUP_WHITE_LIGHT),
-  map(() => lightOn(LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
+  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterReducer.brightness, color_temp: COLOR_TEMP_NEUTRAL }))
 )
 
 const websocketShowerTimerEpic = (
@@ -105,6 +116,7 @@ const websocketShowerTimerEpic = (
 
 type StateUpdateAction = ChangeGroupRedLightAction
 | ChangeGroupWhiteLightAction
+| UpdateBrightnessAction
 | UpdateManualProfileAction
 | UpdateSensorProfileAction
 | UpdateShowerTimerAction
@@ -113,6 +125,7 @@ const websocketUpdateStateEpic = (action$: Observable<StateUpdateAction>): Obser
   ofType(
     CHANGE_GROUP_RED_LIGHT,
     CHANGE_GROUP_WHITE_LIGHT,
+    UPDATE_BRIGHTNESS,
     UPDATE_MANUAL_PROFILE,
     UPDATE_SENSOR_PROFILE,
     UPDATE_SHOWER_TIMER,
