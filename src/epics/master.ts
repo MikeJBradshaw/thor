@@ -89,6 +89,14 @@ const timerExpireEpic = (
   })
 )
 
+const websocketUpdateBrightnessEpic = (
+  action$: Observable<UpdateBrightnessAction>,
+  state$: StateObservable<RootState>
+): Observable<LightOn> => action$.pipe(
+  ofType(UPDATE_BRIGHTNESS),
+  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterReducer.brightness }))
+)
+
 const websocketChangeRedLightEpic = (
   action$: Observable<ChangeGroupRedLightAction>,
   state$: StateObservable<RootState>
@@ -140,6 +148,7 @@ const websocketUpdateStateEpic = (action$: Observable<StateUpdateAction>): Obser
 export default combineEpics(
   motionSensorEpic as any,
   timerExpireEpic as any,
+  websocketUpdateBrightnessEpic as any,
   websocketChangeRedLightEpic as any,
   websocketChangeWhiteLightEpic as any,
   websocketShowerTimerEpic as any,
