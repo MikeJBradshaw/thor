@@ -40,6 +40,8 @@ export const TEST = 'test'
 /*****************************
 * time
 * ***************************/
+export const DAY_END = '19:30:00'
+export const DAY_START = '06:45:00'
 export const HOURS_24_IN_MSEC = 86400000
 export const MINUTES_1_IN_MSEC = 60000
 export const MINUTES_2_IN_MSEC = 120000
@@ -49,7 +51,9 @@ export const MINUTES_20_IN_MSEC = 1200000
 export const MINUTES_15_IN_SEC = 900
 export const MINUTES_30_IN_SEC = 1800
 export const MINUTES_60_IN_SEC = 3600
+export const SECONDS_2 = 2
 export const SECONDS_5 = 5
+export const SECONDS_6_IN_MSEC = 6000
 export const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 6
 
 /*****************************
@@ -74,6 +78,7 @@ export const ROOM_STATE_DOUBLE = 'double'
  * **************************/
 export const BRIGHTNESS_HIGH = 255
 export const BRIGHTNESS_LOW = 15
+export const BRIGHTNESS_1 = 1
 export const BRIGHTNESS_OFF = 0
 
 export const COLOR_TEMP_COOLEST = 'coolest'
@@ -81,6 +86,7 @@ export const COLOR_TEMP_COOL = 'cool'
 export const COLOR_TEMP_NEUTRAL = 'neutral'
 export const COLOR_TEMP_WARM = 'warm'
 export const COLOR_TEMP_WARMEST = 'warmest'
+export const COLOR_HOT_PINK = '#FF69B4'
 export const COLOR_RED_HEX = '#FF0000'
 export const COLOR_ORANGE_HEX = '#FFA500'
 export const COLOR_YELLOW_HEX = '#FFFF00'

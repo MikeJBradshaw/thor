@@ -10,6 +10,10 @@ export const HOME_LOW_ENERGY = 'SUPERVISOR_HOME_LOW_ENERGY'
 export interface HomeLowEnergyAction { type: typeof HOME_LOW_ENERGY }
 export const homeLowEnergy = (): HomeLowEnergyAction => ({ type: HOME_LOW_ENERGY })
 
+export const HOME_SET_BEDTIME = 'SUPERVISOR_HOME_SET_BEDTIME'
+export interface HomeSetBedtimeAction { type: typeof HOME_SET_BEDTIME }
+export const homeSetBedtime = (): HomeSetBedtimeAction => ({ type: HOME_SET_BEDTIME })
+
 export const NETWORK_CHECK = 'SUPERVISOR_NETWORK_CHECK'
 export interface NetworkCheckAction { type: typeof NETWORK_CHECK, responseEpoch: number }
 export const networkCheck = (responseEpoch: number): NetworkCheckAction => ({ type: NETWORK_CHECK, responseEpoch })
@@ -43,11 +47,15 @@ export const setSunriseSunset = (
   solarNoon: string,
   civilTwilightBegin: string,
   civilTwilightEnd: string
-): SetSunriseSunsetAction => ({ type: SET_SUNRISE_SUNSET, payload: { sunrise, sunset, solarNoon, civilTwilightBegin, civilTwilightEnd }})
+): SetSunriseSunsetAction => ({
+  type: SET_SUNRISE_SUNSET,
+  payload: { sunrise, sunset, solarNoon, civilTwilightBegin, civilTwilightEnd }
+})
 
 export type SupervisorAction = SupervisorInitAction
 | SupervisorErrorAction
 | HomeLowEnergyAction
+| HomeSetBedtimeAction
 | NetworkCheckAction
 | NetworkEndRestartAction
 | NetworkErrorAction

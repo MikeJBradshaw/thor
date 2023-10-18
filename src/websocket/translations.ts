@@ -1,7 +1,10 @@
+import type { BedroomOneState } from 'reducers/bedroomOne'
 import type { MasterState } from 'reducers/master'
+
 export const APP_INIT = 'APP_INIT'
 export const CLIENT_HEARTBEAT = 'CLIENT_HEARTBEAT'
 export const MASTER_BATH_INIT = 'MASTER_BATH_INIT'
+export const BEDROOM_ONE_INIT = 'BEDROOM_ONE_INIT'
 export const MASTER_BATH_UPDATE_PROFILE_MANUAL = 'MASTER_BATH_UPDATE_PROFILE_MANUAL'
 export const MASTER_BATH_UPDATE_PROFILE_SENSOR = 'MASTER_BATH_UPDATE_PROFILE_SENSOR'
 export const MASTER_BATH_UPDATE_PROFILE_SHOWER = 'MASTER_BATH_UPDATE_PROFILE_SHOWER'
@@ -17,6 +20,13 @@ export const wsHeartbeat = (): WSHeartbeatEvent => ({ type: WS_HEARTBEAT })
 export const WS_PAYLOAD_REJECTION = 'WS_PAYLOAD_REJECTION'
 export interface WSPayloadRejectionEvent { type: typeof WS_PAYLOAD_REJECTION }
 export const wsPayloadRejection = (): WSPayloadRejectionEvent => ({ type: WS_PAYLOAD_REJECTION })
+
+export const WS_UPDATE_BEDROOM_ONE_STATE = 'WS_UPDATE_BEDROOM_ONE_STATE'
+export interface WSUpdateBedroomOneStateEvent { type: typeof WS_UPDATE_BEDROOM_ONE_STATE, payload: BedroomOneState }
+export const wsUpdateBedroomOneState = (payload: BedroomOneState): WSUpdateBedroomOneStateEvent => ({
+  type: WS_UPDATE_BEDROOM_ONE_STATE,
+  payload
+})
 
 export interface Entity { id: number, name: string, key: string }
 export const WS_UPDATE_ENTITIES = 'WS_UPDATE_ENTITIES'

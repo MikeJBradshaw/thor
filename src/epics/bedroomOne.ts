@@ -1,162 +1,159 @@
-import { Observable, of, interval } from 'rxjs'
+import { Observable, concat, of, timer } from 'rxjs'
 import { switchMap, takeUntil, map } from 'rxjs/operators'
 import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
-  BEDROOM_ONE_BUTTON_CLICK,
-  BEDROOM_ONE_BUTTON_HOLD,
-  BEDROOM_ONE_BUTTON_RELEASE,
   BEDROOM_ONE_LIGHTS_GROUP,
-  BEDROOM_ONE_POWER_ONE
   // BEDROOM_ONE_LIGHT_1,
-  // BEDROOM_ONE_LIGHT_2
+  BEDROOM_ONE_POWER_ONE,
+  UPDATE_BRIGHTNESS,
+  // UPDATE_OCCUPANCY,
+  UPDATE_PROFILE_BRIGHT,
+  UPDATE_PROFILE_COLORS,
+  UPDATE_PROFILE_DEFAULT,
+  UPDATE_PROFILE_RED,
+  UPDATE_PROFILE_SLEEP,
+  updateState
 } from 'actions/bedroomOne'
 import { lightOn, lightOff, noop, powerOn, powerOff } from 'actions/mqttClient'
-import { ROOM_STATE_DOUBLE, ROOM_STATE_SINGLE, RAINBOW_COLORS } from 'consts'
+import {
+  // BRIGHTNESS_1,
+  COLOR_HOT_PINK,
+  COLOR_RED_HEX,
+  COLOR_TEMP_NEUTRAL,
+  RAINBOW_COLORS,
+  SECONDS_6_IN_MSEC,
+  SECONDS_2,
+  SECONDS_5
+} from 'consts'
 import type { RootState } from 'store'
 import type {
-  BedroomOneButtonClickAction,
-  BedroomOneButtonHoldAction,
-  BedroomOneButtonReleaseAction
+  UpdateBrightnessEvent,
+  // UpdateOccupancyAction,
+  UpdateProfileBrightEvent,
+  UpdateProfileColorsEvent,
+  UpdateProfileDefaultEvent,
+  UpdateProfileRedEvent,
+  UpdateProfileSleepEvent
 } from 'actions/bedroomOne'
+import { bedroomOneStateSubject } from 'websocket/bedroomOneEffects'
 import type { LightOn, LightOff, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
 
-type ButtonClickedEpicReturnType = Observable<LightOn | Noop | PowerOn | PowerOff>
-const buttonClickEpic = (
-  action$: Observable<BedroomOneButtonClickAction>,
+const profileBrightEpic = (
+  action$: Observable<UpdateProfileBrightEvent>,
   state$: StateObservable<RootState>
-): ButtonClickedEpicReturnType => action$.pipe(
-  ofType(BEDROOM_ONE_BUTTON_CLICK),
-  switchMap(({ payload: { action } }) => {
-    const currentRoomSetup = state$.value.bedroomOneReducer.roomSetup
-    const override = state$.value.bedroomOneReducer.overrideLights
-    if (override) {
-      of(noop())
-    }
-
-    if (currentRoomSetup === ROOM_STATE_DOUBLE) {
-      const stateType = state$.value.bedroomOneReducer.doubleClickState.type
-      const colorPackage = (stateType === 'color-light')
-        ? { color: { hex: state$.value.bedroomOneReducer.doubleClickState.values.color } }
-        : { color_temp: state$.value.bedroomOneReducer.doubleClickState.values.colorTemp }
-
-      return of(
-        lightOn(
-          BEDROOM_ONE_LIGHTS_GROUP,
-          {
-            brightness: state$.value.bedroomOneReducer.doubleClickState.values.brightness,
-            ...colorPackage
-          }
-        ),
-        powerOff(BEDROOM_ONE_POWER_ONE)
+): Observable<LightOn | PowerOn | PowerOff> => action$.pipe(
+  ofType(UPDATE_PROFILE_BRIGHT),
+  switchMap(() => concat(
+    of(
+      lightOn(
+        BEDROOM_ONE_LIGHTS_GROUP,
+        { brightness: state$.value.bedroomOne.brightness, color_temp: COLOR_TEMP_NEUTRAL }
       )
-    }
-
-    if (currentRoomSetup === ROOM_STATE_SINGLE) {
-      const stateType = state$.value.bedroomOneReducer.singleClickState.type
-      const colorPackage = (stateType === 'color-light')
-        ? { color: { hex: state$.value.bedroomOneReducer.singleClickState.values.color } }
-        : { color_temp: state$.value.bedroomOneReducer.singleClickState.values.colorTemp }
-
-      return of(
-        lightOn(
-          BEDROOM_ONE_LIGHTS_GROUP,
-          {
-            brightness: state$.value.bedroomOneReducer.singleClickState.values.brightness,
-            ...colorPackage
-          }
-        ),
-        powerOn(BEDROOM_ONE_POWER_ONE)
-      )
-    }
-
-    const stateType = state$.value.bedroomOneReducer.defaultState.type
-    const colorPackage = (stateType === 'color-light')
-      ? { color: { hex: state$.value.bedroomOneReducer.defaultState.values.color } }
-      : { color_temp: state$.value.bedroomOneReducer.defaultState.values.colorTemp }
-    const brightness = state$.value.bedroomOneReducer.defaultState.values.brightness
-
-    return of(
-      lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness, ...colorPackage }),
-      powerOff(BEDROOM_ONE_POWER_ONE)
-    )
-  })
-)
-
-// TODO: not working correctly
-type ButtonHoldEpicReturnType = Observable<LightOn>
-const buttonHoldEpic = (
-  action$: Observable<BedroomOneButtonHoldAction | BedroomOneButtonReleaseAction>
-): ButtonHoldEpicReturnType => action$.pipe(
-  ofType(BEDROOM_ONE_BUTTON_HOLD),
-  switchMap(() => interval(1000).pipe(
-    map((val: number) => {
-      return lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness: 255, color: { hex: RAINBOW_COLORS[val % 7] } })
-    }),
-    takeUntil(action$.pipe(ofType(BEDROOM_ONE_BUTTON_RELEASE)))
+    ),
+    of(powerOff(BEDROOM_ONE_POWER_ONE)),
+    timer(1000).pipe(map(() => powerOn(BEDROOM_ONE_POWER_ONE)))
   ))
 )
 
-// TODO: not working correctly
-type ButtonReleaseEpicReturnType = Observable<LightOn | PowerOn | PowerOff>
-export const buttonReleaseEpic = (
-  action$: Observable<BedroomOneButtonReleaseAction>,
+type StopColorsAction = UpdateProfileBrightEvent
+| UpdateProfileDefaultEvent
+| UpdateProfileRedEvent
+| UpdateProfileSleepEvent
+const profileColorsEpic = (
+  action$: Observable<UpdateProfileColorsEvent | StopColorsAction>,
   state$: StateObservable<RootState>
-): ButtonReleaseEpicReturnType => action$.pipe(
-  ofType(BEDROOM_ONE_BUTTON_RELEASE),
-  switchMap(() => {
-    const currentRoomSetup = state$.value.bedroomOneReducer.roomSetup
-    if (currentRoomSetup === ROOM_STATE_DOUBLE) {
-      const stateType = state$.value.bedroomOneReducer.doubleClickState.type
-      const colorPackage = (stateType === 'color-light')
-        ? { color: { hex: state$.value.bedroomOneReducer.doubleClickState.values.color } }
-        : { color_temp: state$.value.bedroomOneReducer.doubleClickState.values.colorTemp }
-
-      return of(
-        lightOn(
-          BEDROOM_ONE_LIGHTS_GROUP,
-          {
-            brightness: state$.value.bedroomOneReducer.doubleClickState.values.brightness,
-            ...colorPackage
-          }
-        ),
-        powerOff(BEDROOM_ONE_POWER_ONE)
-      )
-    }
-
-    if (currentRoomSetup === ROOM_STATE_SINGLE) {
-      const stateType = state$.value.bedroomOneReducer.singleClickState.type
-      const colorPackage = (stateType === 'color-light')
-        ? { color: { hex: state$.value.bedroomOneReducer.singleClickState.values.color } }
-        : { color_temp: state$.value.bedroomOneReducer.singleClickState.values.colorTemp }
-
-      return of(
-        lightOn(
-          BEDROOM_ONE_LIGHTS_GROUP,
-          {
-            brightness: state$.value.bedroomOneReducer.singleClickState.values.brightness,
-            ...colorPackage
-          }
-        ),
-        powerOn(BEDROOM_ONE_POWER_ONE)
-      )
-    }
-
-    const stateType = state$.value.bedroomOneReducer.defaultState.type
-    const colorPackage = (stateType === 'color-light')
-      ? { color: { hex: state$.value.bedroomOneReducer.defaultState.values.color } }
-      : { color_temp: state$.value.bedroomOneReducer.defaultState.values.colorTemp }
-    const brightness = state$.value.bedroomOneReducer.defaultState.values.brightness
-
-    return of(
-      lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness, ...colorPackage }),
-      powerOff(BEDROOM_ONE_POWER_ONE)
+): Observable<LightOn> => action$.pipe(
+  ofType(UPDATE_PROFILE_COLORS),
+  switchMap(() => timer(0, SECONDS_6_IN_MSEC).pipe(
+    map(val => lightOn(
+      BEDROOM_ONE_LIGHTS_GROUP,
+      {
+        brightness: state$.value.bedroomOne.brightness,
+        color: { hex: RAINBOW_COLORS[val % 7] },
+        transition: SECONDS_5
+      }
+    )),
+    takeUntil(
+      action$.pipe(ofType(UPDATE_PROFILE_BRIGHT, UPDATE_PROFILE_DEFAULT, UPDATE_PROFILE_RED, UPDATE_PROFILE_SLEEP))
     )
+  ))
+)
+
+const profileDefaultEpic = (
+  action$: Observable<UpdateProfileDefaultEvent>,
+  state$: StateObservable<RootState>
+): Observable<LightOn | PowerOff | PowerOn> => action$.pipe(
+  ofType(UPDATE_PROFILE_DEFAULT),
+  switchMap(() => concat(
+    of(
+      lightOn(
+        BEDROOM_ONE_LIGHTS_GROUP,
+        { brightness: state$.value.bedroomOne.brightness, color: { hex: COLOR_HOT_PINK }, transition: SECONDS_2 }
+      )
+    ),
+    of(powerOff(BEDROOM_ONE_POWER_ONE)),
+    timer(1000).pipe(map(() => powerOn(BEDROOM_ONE_POWER_ONE)))
+  ))
+)
+
+const profileRedEpic = (
+  action$: Observable<UpdateProfileRedEvent>,
+  state$: StateObservable<RootState>
+): Observable<LightOn> => action$.pipe(
+  ofType(UPDATE_PROFILE_RED),
+  map(() => lightOn(
+    BEDROOM_ONE_LIGHTS_GROUP,
+    { brightness: state$.value.bedroomOne.brightness, color: { hex: COLOR_RED_HEX } }
+  ))
+)
+
+const profileSleepEpic = (action$: Observable<UpdateProfileSleepEvent>): Observable<LightOff | PowerOn> => action$.pipe(
+  ofType(UPDATE_PROFILE_SLEEP),
+  switchMap(() => concat(
+    of(lightOff(BEDROOM_ONE_LIGHTS_GROUP)),
+    of(powerOn(BEDROOM_ONE_POWER_ONE))
+  ))
+)
+
+// const redLightNightLightEpic = (
+//   action$: Observable<UpdateOccupancyAction>
+// ): Observable<LightOn> => action$.pipe(
+//   ofType(UPDATE_OCCUPANCY),
+//   map(() => lightOn(BEDROOM_ONE_LIGHT_1, { brightness: BRIGHTNESS_1, color: { hex: COLOR_RED_HEX } })),
+//   takeUntil(
+//     action$.pipe(
+//       ofType(UPDATE_OCCUPANCY_FALSE)
+//     )
+//   )
+// )
+type UpdateStateActions = UpdateBrightnessEvent
+| UpdateProfileBrightEvent
+| UpdateProfileColorsEvent
+| UpdateProfileDefaultEvent
+| UpdateProfileRedEvent
+| UpdateProfileSleepEvent
+const updateStateEpic = (action$: Observable<UpdateStateActions>): Observable<Noop> => action$.pipe(
+  ofType(
+    UPDATE_BRIGHTNESS,
+    UPDATE_PROFILE_BRIGHT,
+    UPDATE_PROFILE_COLORS,
+    UPDATE_PROFILE_DEFAULT,
+    UPDATE_PROFILE_RED,
+    UPDATE_PROFILE_SLEEP
+  ),
+  map(() => {
+    bedroomOneStateSubject.next(updateState())
+    return noop()
   })
 )
 
 export default combineEpics(
-  buttonClickEpic as any,
-  buttonHoldEpic as any,
-  buttonReleaseEpic as any
+  profileBrightEpic as any,
+  profileColorsEpic as any,
+  profileDefaultEpic as any,
+  profileRedEpic as any,
+  profileSleepEpic as any,
+  updateStateEpic as any
+  // redLightNightLightEpic as any
 )

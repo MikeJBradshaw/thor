@@ -3,11 +3,8 @@ import { webSocketListener, createWebSocketServer } from '@marblejs/websockets'
 import type { IO } from 'fp-ts/lib/IO'
 import type { MqttClient } from 'mqtt'
 
-import {
-  bedroomOneButtonClick,
-  bedroomOneButtonHold,
-  bedroomOneButtonRelease
-} from 'actions/bedroomOne'
+// import {
+// } from 'actions/bedroomOne'
 import { motionSensor } from 'actions/laundry' // TODO: fix this naming
 import {
   guestBathButtonClick,
@@ -38,6 +35,7 @@ import {
 } from 'consts'
 import websocketEffects from 'websocket/websocketEffects'
 import masterBathEffects from 'websocket/masterBathEffects'
+import bedroomOneEffects from 'websocket/bedroomOneEffects'
 import store from 'store'
 import config from '../configuration.json'
 
@@ -96,17 +94,6 @@ export const bedroomOneRouter = (device: string, buffer: Buffer): void => {
   const data = JSON.parse(buffer.toString())
   if (device === BUTTON) {
     switch (data.action) {
-      case BUTTON_STATE_SINGLE:
-      case BUTTON_STATE_DOUBLE:
-        store.dispatch(bedroomOneButtonClick(data))
-        return
-
-      case BUTTON_STATE_HOLD:
-        store.dispatch(bedroomOneButtonHold(data))
-        return
-
-      case BUTTON_STATE_RELEASE:
-        store.dispatch(bedroomOneButtonRelease(data))
     }
   }
 }
@@ -217,7 +204,8 @@ store.subscribe(() => {
 if (config.websocketServer !== undefined) {
   const effects = [
     ...websocketEffects,
-    ...masterBathEffects
+    ...masterBathEffects,
+    ...bedroomOneEffects
   ]
 
   const { host, port } = config.websocketServer

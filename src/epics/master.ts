@@ -52,7 +52,7 @@ const motionSensorEpic = (
   ofType(MASTER_BATH_MOTION_SENSOR),
   // broadcast(websocketClient, wsUpdateState),
   switchMap(({ payload: { occupancy } }) => {
-    if (state$.value.masterReducer.isProfileManual) {
+    if (state$.value.masterBath.isProfileManual) {
       return of(noop())
     } else {
       if (occupancy) {
@@ -82,7 +82,7 @@ const timerExpireEpic = (
 ): Observable<LightOff | Noop> => action$.pipe(
   ofType(UPDATE_TIMER_EXPIRE),
   switchMap(() => {
-    if (state$.value.masterReducer.occupancy) {
+    if (state$.value.masterBath.occupancy) {
       return of(noop())
     }
     return of(lightOff(LIGHTS_GROUP, SECONDS_5))
@@ -94,7 +94,7 @@ const websocketUpdateBrightnessEpic = (
   state$: StateObservable<RootState>
 ): Observable<LightOn> => action$.pipe(
   ofType(UPDATE_BRIGHTNESS),
-  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterReducer.brightness }))
+  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterBath.brightness }))
 )
 
 const websocketChangeRedLightEpic = (
@@ -102,7 +102,7 @@ const websocketChangeRedLightEpic = (
   state$: StateObservable<RootState>
 ): Observable<LightOn | UpdateBrightnessAction> => action$.pipe(
   ofType(CHANGE_GROUP_RED_LIGHT),
-  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterReducer.brightness, color: { hex: COLOR_RED_HEX } }))
+  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterBath.brightness, color: { hex: COLOR_RED_HEX } }))
 )
 
 const websocketChangeWhiteLightEpic = (
@@ -110,7 +110,7 @@ const websocketChangeWhiteLightEpic = (
   state$: StateObservable<RootState>
 ): Observable<LightOn> => action$.pipe(
   ofType(CHANGE_GROUP_WHITE_LIGHT),
-  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterReducer.brightness, color_temp: COLOR_TEMP_NEUTRAL }))
+  map(() => lightOn(LIGHTS_GROUP, { brightness: state$.value.masterBath.brightness, color_temp: COLOR_TEMP_NEUTRAL }))
 )
 
 const websocketShowerTimerEpic = (

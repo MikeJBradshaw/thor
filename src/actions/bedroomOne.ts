@@ -1,32 +1,49 @@
-import { ButtonPayload } from 'types/payloads'
+import type { MotionSensorPayload } from 'types/payloads'
 
-/***************
- * DEVICES
- * ************/
 export const BEDROOM_ONE_LIGHTS_GROUP = 'z2m/bedroom_1_lights'
 export const BEDROOM_ONE_LIGHT_1 = 'z2m/sink/bedroom_1/light/light_1'
 export const BEDROOM_ONE_LIGHT_2 = 'z2m/sink/bedroom_1/light/light_2'
-
 export const BEDROOM_ONE_POWER_ONE = 'z2m/sink/bedroom_1/power/sound_machine'
 
-export const BEDROOM_ONE_BUTTON_CLICK = 'BEDROOM_ONE_BUTTON_CLICK'
-export interface BedroomOneButtonClickAction { type: typeof BEDROOM_ONE_BUTTON_CLICK, payload: ButtonPayload }
-export const bedroomOneButtonClick = (
-  payload: ButtonPayload
-): BedroomOneButtonClickAction => ({ type: BEDROOM_ONE_BUTTON_CLICK, payload })
+export const UPDATE_BRIGHTNESS = 'BEDROOM_ONE_UPDATE_BRIGHTNESS'
+export interface UpdateBrightnessEvent { type: typeof UPDATE_BRIGHTNESS, payload: number }
+export const updateBrightness = (payload: number): UpdateBrightnessEvent => ({ type: UPDATE_BRIGHTNESS, payload })
 
-export const BEDROOM_ONE_BUTTON_HOLD = 'BEDROOM_ONE_BUTTON_HOLD'
-export interface BedroomOneButtonHoldAction { type: typeof BEDROOM_ONE_BUTTON_HOLD, payload: ButtonPayload }
-export const bedroomOneButtonHold = (
-  payload: ButtonPayload
-): BedroomOneButtonHoldAction => ({ type: BEDROOM_ONE_BUTTON_HOLD, payload })
+export const UPDATE_OCCUPANCY = 'BEDROOM_ONE_UPDATE_OCCUPANCY'
+export interface UpdateOccupancyAction { type: typeof UPDATE_OCCUPANCY, payload: MotionSensorPayload }
+export const updateOccupancy = (
+  payload: MotionSensorPayload
+): UpdateOccupancyAction => ({ type: UPDATE_OCCUPANCY, payload })
 
-export const BEDROOM_ONE_BUTTON_RELEASE = 'BEDROOM_ONE_BUTTON_RELEASE'
-export interface BedroomOneButtonReleaseAction { type: typeof BEDROOM_ONE_BUTTON_RELEASE, payload: ButtonPayload }
-export const bedroomOneButtonRelease = (
-  payload: ButtonPayload
-): BedroomOneButtonReleaseAction => ({ type: BEDROOM_ONE_BUTTON_RELEASE, payload })
+export const UPDATE_PROFILE_BRIGHT = 'BEDROOM_ONE_UPDATE_PROFILE_BRIGHT'
+export interface UpdateProfileBrightEvent { type: typeof UPDATE_PROFILE_BRIGHT }
+export const upateProfileBright = (): UpdateProfileBrightEvent => ({ type: UPDATE_PROFILE_BRIGHT })
 
-export type BedroomOneAction = BedroomOneButtonClickAction
-| BedroomOneButtonHoldAction
-| BedroomOneButtonReleaseAction
+export const UPDATE_PROFILE_COLORS = 'BEDROOM_ONE_UPDATE_PROFILE_COLORS'
+export interface UpdateProfileColorsEvent { type: typeof UPDATE_PROFILE_COLORS }
+export const updateProfileColors = (): UpdateProfileColorsEvent => ({ type: UPDATE_PROFILE_COLORS })
+
+export const UPDATE_PROFILE_DEFAULT = 'BEDROOM_ONE_UPDATE_PROFILE_DEFAULT'
+export interface UpdateProfileDefaultEvent { type: typeof UPDATE_PROFILE_DEFAULT }
+export const updateProfileDefault = (): UpdateProfileDefaultEvent => ({ type: UPDATE_PROFILE_DEFAULT })
+
+export const UPDATE_PROFILE_RED = 'BEDROOM_ONE_UPDATE_PROFILE_RED'
+export interface UpdateProfileRedEvent { type: typeof UPDATE_PROFILE_RED }
+export const updateProfileRed = (): UpdateProfileRedEvent => ({ type: UPDATE_PROFILE_RED })
+
+export const UPDATE_PROFILE_SLEEP = 'BEDROOM_ONE_UPDATE_PROFILE_SLEEP'
+export interface UpdateProfileSleepEvent { type: typeof UPDATE_PROFILE_SLEEP }
+export const updateProfileSleep = (): UpdateProfileSleepEvent => ({ type: UPDATE_PROFILE_SLEEP })
+
+export const UPDATE_STATE = 'BEDROOM_ONE_UPDATE_STATE'
+export interface UpdateStateAction { type: typeof UPDATE_STATE }
+export const updateState = (): UpdateStateAction => ({ type: UPDATE_STATE })
+
+export type BedroomOneAction = UpdateBrightnessEvent
+| UpdateOccupancyAction
+| UpdateProfileBrightEvent
+| UpdateProfileColorsEvent
+| UpdateProfileDefaultEvent
+| UpdateProfileRedEvent
+| UpdateProfileSleepEvent
+| UpdateStateAction

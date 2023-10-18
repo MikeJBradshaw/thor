@@ -32,12 +32,12 @@ import store from 'store'
 type WebsocketUpdateStateAction = UpdateStateAction
 export const stateUpdateSubject = new Subject<WebsocketUpdateStateAction>()
 
-export const init: WsEffect = event$ => event$.pipe(
+const init: WsEffect = event$ => event$.pipe(
   matchEvent(MASTER_BATH_INIT),
-  switchMap(() => of(wsUpdateMasterBathState(store.getState().masterReducer)))
+  switchMap(() => of(wsUpdateMasterBathState(store.getState().masterBath)))
 )
 
-export const brightness: WsEffect = (event$, ...args) => event$.pipe(
+const brightness: WsEffect = (event$, ...args) => event$.pipe(
   matchEvent(UPDATE_BRIGHTNESS),
   eventValidator$(t.number),
   map(({ payload }) => {
@@ -47,7 +47,7 @@ export const brightness: WsEffect = (event$, ...args) => event$.pipe(
   catchError(() => of(wsPayloadRejection()))
 )
 
-export const changeRedLight: WsEffect = event$ => event$.pipe(
+const changeRedLight: WsEffect = event$ => event$.pipe(
   matchEvent(CHANGE_GROUP_RED_LIGHT),
   map(() => {
     store.dispatch(changeGroupRedLight())
@@ -55,7 +55,7 @@ export const changeRedLight: WsEffect = event$ => event$.pipe(
   })
 )
 
-export const changeWhiteLight: WsEffect = event$ => event$.pipe(
+const changeWhiteLight: WsEffect = event$ => event$.pipe(
   matchEvent(CHANGE_GROUP_WHITE_LIGHT),
   map(() => {
     store.dispatch(changeGroupWhiteLight())
@@ -63,7 +63,7 @@ export const changeWhiteLight: WsEffect = event$ => event$.pipe(
   })
 )
 
-export const manualProfile: WsEffect = event$ => event$.pipe(
+const manualProfile: WsEffect = event$ => event$.pipe(
   matchEvent(MASTER_BATH_UPDATE_PROFILE_MANUAL),
   map(() => {
     store.dispatch(updateManualProfile())
@@ -71,7 +71,7 @@ export const manualProfile: WsEffect = event$ => event$.pipe(
   })
 )
 
-export const sensorProfile: WsEffect = event$ => event$.pipe(
+const sensorProfile: WsEffect = event$ => event$.pipe(
   matchEvent(MASTER_BATH_UPDATE_PROFILE_SENSOR),
   map(() => {
     store.dispatch(updateSensorProfile())
@@ -79,7 +79,7 @@ export const sensorProfile: WsEffect = event$ => event$.pipe(
   })
 )
 
-export const showerProfile: WsEffect = event$ => event$.pipe(
+const showerProfile: WsEffect = event$ => event$.pipe(
   matchEvent(MASTER_BATH_UPDATE_PROFILE_SHOWER),
   map(() => {
     store.dispatch(updateShowerTimer())
@@ -87,11 +87,11 @@ export const showerProfile: WsEffect = event$ => event$.pipe(
   })
 )
 
-export const updateState: WsEffect = event$ => event$.pipe(
+const updateState: WsEffect = event$ => event$.pipe(
   matchEvent(MASTER_BATH_INIT),
   switchMap(() => stateUpdateSubject.pipe(
     ofType(UPDATE_STATE),
-    map(() => wsUpdateMasterBathState(store.getState().masterReducer))
+    map(() => wsUpdateMasterBathState(store.getState().masterBath))
   ))
 )
 
