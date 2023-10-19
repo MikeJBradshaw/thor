@@ -17,7 +17,7 @@ export const updateOccupancy = (
 
 export const UPDATE_PROFILE_BRIGHT = 'BEDROOM_ONE_UPDATE_PROFILE_BRIGHT'
 export interface UpdateProfileBrightEvent { type: typeof UPDATE_PROFILE_BRIGHT }
-export const upateProfileBright = (): UpdateProfileBrightEvent => ({ type: UPDATE_PROFILE_BRIGHT })
+export const updateProfileBright = (): UpdateProfileBrightEvent => ({ type: UPDATE_PROFILE_BRIGHT })
 
 export const UPDATE_PROFILE_COLORS = 'BEDROOM_ONE_UPDATE_PROFILE_COLORS'
 export interface UpdateProfileColorsEvent { type: typeof UPDATE_PROFILE_COLORS }
