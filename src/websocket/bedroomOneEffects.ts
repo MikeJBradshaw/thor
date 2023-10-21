@@ -10,10 +10,14 @@ import {
   UPDATE_PROFILE_COLORS,
   UPDATE_PROFILE_DEFAULT,
   UPDATE_PROFILE_SLEEP,
+  UPDATE_RED_LIGHT_ON,
+  UPDATE_WHITE_LIGHT_ON,
   updateProfileBright,
   updateProfileColors,
   updateProfileDefault,
-  updateProfileSleep
+  updateProfileSleep,
+  updateRedLightOn,
+  updateWhiteLightOn
 } from 'actions/bedroomOne'
 import { BEDROOM_ONE_INIT, wsUpdateBedroomOneState, wsAck } from 'websocket/translations'
 import type { UpdateStateAction } from 'actions/bedroomOne'
@@ -58,6 +62,22 @@ const sleepProfile: WsEffect = event$ => event$.pipe(
   })
 )
 
+const redLightOn: WsEffect = event$ => event$.pipe(
+  matchEvent(UPDATE_RED_LIGHT_ON),
+  map(() => {
+    store.dispatch(updateRedLightOn())
+    return wsAck()
+  })
+)
+
+const whiteLightOn: WsEffect = event$ => event$.pipe(
+  matchEvent(UPDATE_WHITE_LIGHT_ON),
+  map(() => {
+    store.dispatch(updateWhiteLightOn())
+    return wsAck()
+  })
+)
+
 const updateState: WsEffect = event$ => event$.pipe(
   matchEvent(BEDROOM_ONE_INIT),
   switchMap(() => bedroomOneStateSubject.pipe(
@@ -72,5 +92,7 @@ export default [
   colorsProfile,
   defaultProfile,
   sleepProfile,
+  redLightOn,
+  whiteLightOn,
   updateState
 ]

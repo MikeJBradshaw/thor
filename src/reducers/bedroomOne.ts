@@ -7,7 +7,9 @@ import {
   UPDATE_PROFILE_COLORS,
   UPDATE_PROFILE_DEFAULT,
   UPDATE_PROFILE_RED,
-  UPDATE_PROFILE_SLEEP
+  UPDATE_PROFILE_SLEEP,
+  UPDATE_RED_LIGHT_ON,
+  UPDATE_WHITE_LIGHT_ON
 } from 'actions/bedroomOne'
 import { BRIGHTNESS_OFF } from 'consts'
 import type { BedroomOneAction } from 'actions/bedroomOne'
@@ -19,6 +21,8 @@ export interface BedroomOneState {
   isProfileDefault: boolean
   isProfileRed: boolean
   isProfileSleep: boolean
+  isRedLight: boolean
+  isWhiteLight: boolean
   occupancy: boolean
 }
 
@@ -29,6 +33,8 @@ const initState: BedroomOneState = {
   isProfileDefault: true,
   isProfileRed: false,
   isProfileSleep: false,
+  isRedLight: false,
+  isWhiteLight: false,
   occupancy: false
 }
 
@@ -43,52 +49,73 @@ const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = i
     case UPDATE_PROFILE_BRIGHT:
       return {
         ...state,
+        brightness: 255,
         isProfileBright: true,
         isProfileColors: false,
         isProfileDefault: false,
         isProfileRed: false,
-        isProfileSleep: false
+        isProfileSleep: false,
+        isRedLight: false,
+        isWhiteLight: true
       }
 
     case UPDATE_PROFILE_COLORS:
       return {
         ...state,
+        brightness: 255,
         isProfileBright: false,
         isProfileColors: true,
         isProfileDefault: false,
         isProfileRed: false,
-        isProfileSleep: false
+        isProfileSleep: false,
+        isRedLight: false,
+        isWhiteLight: false
       }
 
     case UPDATE_PROFILE_DEFAULT:
       return {
         ...state,
+        brightness: 255,
         isProfileBright: false,
         isProfileColors: false,
         isProfileDefault: true,
         isProfileRed: false,
-        isProfileSleep: false
+        isProfileSleep: false,
+        isRedLight: false,
+        isWhiteLight: false
       }
 
     case UPDATE_PROFILE_RED:
       return {
         ...state,
+        brightness: 5,
         isProfileBright: false,
         isProfileColors: false,
         isProfileDefault: false,
         isProfileRed: true,
-        isProfileSleep: false
+        isProfileSleep: false,
+        isRedLight: true,
+        isWhiteLight: false
       }
 
     case UPDATE_PROFILE_SLEEP:
       return {
         ...state,
+        brightness: 0,
         isProfileBright: false,
         isProfileColors: false,
         isProfileDefault: false,
         isProfileRed: false,
-        isProfileSleep: true
+        isProfileSleep: true,
+        isRedLight: false,
+        isWhiteLight: false
       }
+    
+    case UPDATE_RED_LIGHT_ON:
+      return { ...state, isRedLight: true, isWhiteLight: false }
+
+    case UPDATE_WHITE_LIGHT_ON:
+      return { ...state, isRedLight: false, isWhiteLight: true }
 
     default:
       return state

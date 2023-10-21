@@ -13,6 +13,8 @@ import {
   UPDATE_PROFILE_DEFAULT,
   UPDATE_PROFILE_RED,
   UPDATE_PROFILE_SLEEP,
+  UPDATE_RED_LIGHT_ON,
+  UPDATE_WHITE_LIGHT_ON,
   updateState
 } from 'actions/bedroomOne'
 import { lightOn, lightOff, noop, powerOn, powerOff } from 'actions/mqttClient'
@@ -34,7 +36,9 @@ import type {
   UpdateProfileColorsEvent,
   UpdateProfileDefaultEvent,
   UpdateProfileRedEvent,
-  UpdateProfileSleepEvent
+  UpdateProfileSleepEvent,
+  UpdateRedLightOnEvent,
+  UpdateWhiteLightOnEvent
 } from 'actions/bedroomOne'
 import { bedroomOneStateSubject } from 'websocket/bedroomOneEffects'
 import type { LightOn, LightOff, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
@@ -60,6 +64,8 @@ type StopColorsAction = UpdateProfileBrightEvent
 | UpdateProfileDefaultEvent
 | UpdateProfileRedEvent
 | UpdateProfileSleepEvent
+| UpdateRedLightOnEvent
+| UpdateWhiteLightOnEvent
 const profileColorsEpic = (
   action$: Observable<UpdateProfileColorsEvent | StopColorsAction>,
   state$: StateObservable<RootState>
@@ -127,12 +133,15 @@ const profileSleepEpic = (action$: Observable<UpdateProfileSleepEvent>): Observa
 //     )
 //   )
 // )
+
 type UpdateStateActions = UpdateBrightnessEvent
 | UpdateProfileBrightEvent
 | UpdateProfileColorsEvent
 | UpdateProfileDefaultEvent
 | UpdateProfileRedEvent
 | UpdateProfileSleepEvent
+| UpdateRedLightOnEvent
+| UpdateWhiteLightOnEvent
 const updateStateEpic = (action$: Observable<UpdateStateActions>): Observable<Noop> => action$.pipe(
   ofType(
     UPDATE_BRIGHTNESS,
@@ -140,7 +149,9 @@ const updateStateEpic = (action$: Observable<UpdateStateActions>): Observable<No
     UPDATE_PROFILE_COLORS,
     UPDATE_PROFILE_DEFAULT,
     UPDATE_PROFILE_RED,
-    UPDATE_PROFILE_SLEEP
+    UPDATE_PROFILE_SLEEP,
+    UPDATE_RED_LIGHT_ON,
+    UPDATE_WHITE_LIGHT_ON
   ),
   map(() => {
     bedroomOneStateSubject.next(updateState())

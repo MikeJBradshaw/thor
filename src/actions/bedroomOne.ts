@@ -35,9 +35,17 @@ export const UPDATE_PROFILE_SLEEP = 'BEDROOM_ONE_UPDATE_PROFILE_SLEEP'
 export interface UpdateProfileSleepEvent { type: typeof UPDATE_PROFILE_SLEEP }
 export const updateProfileSleep = (): UpdateProfileSleepEvent => ({ type: UPDATE_PROFILE_SLEEP })
 
+export const UPDATE_RED_LIGHT_ON = 'BEDROOM_ONE_UPDATE_RED_LIGHT_ON'
+export interface UpdateRedLightOnEvent { type: typeof UPDATE_RED_LIGHT_ON }
+export const updateRedLightOn = (): UpdateRedLightOnEvent => ({ type: UPDATE_RED_LIGHT_ON })
+
 export const UPDATE_STATE = 'BEDROOM_ONE_UPDATE_STATE'
 export interface UpdateStateAction { type: typeof UPDATE_STATE }
 export const updateState = (): UpdateStateAction => ({ type: UPDATE_STATE })
+
+export const UPDATE_WHITE_LIGHT_ON = 'BEDROOM_ONE_UPDATE_WHITE_LIGHT_ON'
+export interface UpdateWhiteLightOnEvent { type: typeof UPDATE_WHITE_LIGHT_ON }
+export const updateWhiteLightOn = (): UpdateWhiteLightOnEvent => ({ type: UPDATE_WHITE_LIGHT_ON })
 
 export type BedroomOneAction = UpdateBrightnessEvent
 | UpdateOccupancyAction
@@ -46,4 +54,6 @@ export type BedroomOneAction = UpdateBrightnessEvent
 | UpdateProfileDefaultEvent
 | UpdateProfileRedEvent
 | UpdateProfileSleepEvent
+| UpdateRedLightOnEvent
 | UpdateStateAction
+| UpdateWhiteLightOnEvent
