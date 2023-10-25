@@ -26,6 +26,12 @@ export const ENTITIES = [
   MASTER_BATH
 ]
 
+export const FRONT_END_SUPPORTED_ENTITIES = [
+  'master-bath',
+  'bedroom-one',
+  'guest-bath'
+]
+
 // devices
 export const BUTTON = 'button'
 export const MOTION_SENSOR = 'motion_sensor'
@@ -78,6 +84,7 @@ export const ROOM_STATE_DOUBLE = 'double'
  * **************************/
 export const BRIGHTNESS_HIGH = 255
 export const BRIGHTNESS_LOW = 15
+export const BRIGHTNESS_VERY_LOW = 5
 export const BRIGHTNESS_1 = 1
 export const BRIGHTNESS_OFF = 0
 

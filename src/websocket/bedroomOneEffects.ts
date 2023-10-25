@@ -1,17 +1,20 @@
 import { matchEvent } from '@marblejs/core'
+import { t, eventValidator$ } from '@marblejs/middleware-io'
 import { Subject, of } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import type { WsEffect } from '@marblejs/websockets'
 
 import {
   UPDATE_STATE,
+  UPDATE_BRIGHTNESS,
   UPDATE_PROFILE_BRIGHT,
   UPDATE_PROFILE_COLORS,
   UPDATE_PROFILE_DEFAULT,
   UPDATE_PROFILE_SLEEP,
   UPDATE_RED_LIGHT_ON,
   UPDATE_WHITE_LIGHT_ON,
+  updateBrightness,
   updateProfileBright,
   updateProfileColors,
   updateProfileDefault,
@@ -19,7 +22,7 @@ import {
   updateRedLightOn,
   updateWhiteLightOn
 } from 'actions/bedroomOne'
-import { BEDROOM_ONE_INIT, wsUpdateBedroomOneState, wsAck } from 'websocket/translations'
+import { BEDROOM_ONE_INIT, wsUpdateBedroomOneState, wsAck, wsPayloadRejection } from 'websocket/translations'
 import type { UpdateStateAction } from 'actions/bedroomOne'
 import store from 'store'
 
@@ -30,6 +33,15 @@ const init: WsEffect = event$ => event$.pipe(
   switchMap(() => of(wsUpdateBedroomOneState(store.getState().bedroomOne)))
 )
 
+const brightness: WsEffect = (event$, ...args) => event$.pipe(
+  matchEvent(UPDATE_BRIGHTNESS),
+  eventValidator$(t.number),
+  map(({ payload }) => {
+    store.dispatch(updateBrightness(+payload))
+    return wsAck()
+  }),
+  catchError(() => of(wsPayloadRejection()))
+)
 const brightnessProfile: WsEffect = event$ => event$.pipe(
   matchEvent(UPDATE_PROFILE_BRIGHT),
   map(() => {
@@ -88,6 +100,7 @@ const updateState: WsEffect = event$ => event$.pipe(
 
 export default [
   init,
+  brightness,
   brightnessProfile,
   colorsProfile,
   defaultProfile,

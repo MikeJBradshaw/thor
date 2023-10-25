@@ -122,18 +122,6 @@ const profileSleepEpic = (action$: Observable<UpdateProfileSleepEvent>): Observa
   ))
 )
 
-// const redLightNightLightEpic = (
-//   action$: Observable<UpdateOccupancyAction>
-// ): Observable<LightOn> => action$.pipe(
-//   ofType(UPDATE_OCCUPANCY),
-//   map(() => lightOn(BEDROOM_ONE_LIGHT_1, { brightness: BRIGHTNESS_1, color: { hex: COLOR_RED_HEX } })),
-//   takeUntil(
-//     action$.pipe(
-//       ofType(UPDATE_OCCUPANCY_FALSE)
-//     )
-//   )
-// )
-
 type UpdateStateActions = UpdateBrightnessEvent
 | UpdateProfileBrightEvent
 | UpdateProfileColorsEvent
@@ -166,5 +154,4 @@ export default combineEpics(
   profileRedEpic as any,
   profileSleepEpic as any,
   updateStateEpic as any
-  // redLightNightLightEpic as any
 )
