@@ -13,6 +13,8 @@ import {
   UPDATE_PROFILE_DEFAULT,
   UPDATE_PROFILE_RED,
   UPDATE_PROFILE_SLEEP,
+  UPDATE_POWER_OFF,
+  UPDATE_POWER_ON,
   UPDATE_RED_LIGHT_ON,
   UPDATE_WHITE_LIGHT_ON,
   updateState
@@ -37,6 +39,8 @@ import type {
   UpdateProfileDefaultEvent,
   UpdateProfileRedEvent,
   UpdateProfileSleepEvent,
+  UpdatePowerOffEvent,
+  UpdatePowerOnEvent,
   UpdateRedLightOnEvent,
   UpdateWhiteLightOnEvent
 } from 'actions/bedroomOne'
@@ -122,12 +126,24 @@ const profileSleepEpic = (action$: Observable<UpdateProfileSleepEvent>): Observa
   ))
 )
 
+const powerOnEpic = (action$: Observable<UpdatePowerOnEvent>): Observable<PowerOn> => action$.pipe(
+  ofType(UPDATE_POWER_ON),
+  map(() => powerOn(BEDROOM_ONE_POWER_ONE))
+)
+
+const powerOffEpic = (action$: Observable<UpdatePowerOffEvent>): Observable<PowerOff> => action$.pipe(
+  ofType(UPDATE_POWER_OFF),
+  map(() => powerOff(BEDROOM_ONE_POWER_ONE))
+)
+
 type UpdateStateActions = UpdateBrightnessEvent
 | UpdateProfileBrightEvent
 | UpdateProfileColorsEvent
 | UpdateProfileDefaultEvent
 | UpdateProfileRedEvent
 | UpdateProfileSleepEvent
+| UpdatePowerOffEvent
+| UpdatePowerOnEvent
 | UpdateRedLightOnEvent
 | UpdateWhiteLightOnEvent
 const updateStateEpic = (action$: Observable<UpdateStateActions>): Observable<Noop> => action$.pipe(
@@ -138,6 +154,8 @@ const updateStateEpic = (action$: Observable<UpdateStateActions>): Observable<No
     UPDATE_PROFILE_DEFAULT,
     UPDATE_PROFILE_RED,
     UPDATE_PROFILE_SLEEP,
+    UPDATE_POWER_OFF,
+    UPDATE_POWER_ON,
     UPDATE_RED_LIGHT_ON,
     UPDATE_WHITE_LIGHT_ON
   ),
@@ -153,5 +171,7 @@ export default combineEpics(
   profileDefaultEpic as any,
   profileRedEpic as any,
   profileSleepEpic as any,
+  powerOnEpic as any,
+  powerOffEpic as any,
   updateStateEpic as any
 )

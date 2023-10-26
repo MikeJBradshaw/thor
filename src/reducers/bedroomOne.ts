@@ -3,6 +3,8 @@ import type { Reducer } from 'redux'
 import {
   UPDATE_BRIGHTNESS,
   UPDATE_OCCUPANCY,
+  UPDATE_POWER_OFF,
+  UPDATE_POWER_ON,
   UPDATE_PROFILE_BRIGHT,
   UPDATE_PROFILE_COLORS,
   UPDATE_PROFILE_DEFAULT,
@@ -24,6 +26,7 @@ export interface BedroomOneState {
   isRedLight: boolean
   isWhiteLight: boolean
   occupancy: boolean
+  power: boolean
 }
 
 const initState: BedroomOneState = {
@@ -35,7 +38,8 @@ const initState: BedroomOneState = {
   isProfileSleep: false,
   isRedLight: false,
   isWhiteLight: false,
-  occupancy: false
+  occupancy: false,
+  power: false
 }
 
 const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = initState, action) => {
@@ -59,6 +63,12 @@ const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = i
         isWhiteLight: true
       }
 
+    case UPDATE_POWER_OFF:
+      return { ...state, power: false }
+
+    case UPDATE_POWER_ON:
+      return { ...state, power: true }
+
     case UPDATE_PROFILE_COLORS:
       return {
         ...state,
@@ -69,7 +79,8 @@ const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = i
         isProfileRed: false,
         isProfileSleep: false,
         isRedLight: false,
-        isWhiteLight: false
+        isWhiteLight: false,
+        power: false
       }
 
     case UPDATE_PROFILE_DEFAULT:
@@ -82,7 +93,8 @@ const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = i
         isProfileRed: false,
         isProfileSleep: false,
         isRedLight: false,
-        isWhiteLight: false
+        isWhiteLight: false,
+        power: false
       }
 
     case UPDATE_PROFILE_RED:
@@ -108,7 +120,8 @@ const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = i
         isProfileRed: false,
         isProfileSleep: true,
         isRedLight: false,
-        isWhiteLight: false
+        isWhiteLight: false,
+        power: true
       }
     
     case UPDATE_RED_LIGHT_ON:

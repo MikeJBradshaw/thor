@@ -15,6 +15,14 @@ export const updateOccupancy = (
   payload: MotionSensorPayload
 ): UpdateOccupancyAction => ({ type: UPDATE_OCCUPANCY, payload })
 
+export const UPDATE_POWER_OFF = 'BEDROOM_ONE_UPDATE_POWER_OFF'
+export interface UpdatePowerOffEvent { type: typeof UPDATE_POWER_OFF }
+export const updatePowerOff = (): UpdatePowerOffEvent => ({ type: UPDATE_POWER_OFF })
+
+export const UPDATE_POWER_ON = 'BEDROOM_ONE_UPDATE_POWER_ON'
+export interface UpdatePowerOnEvent { type: typeof UPDATE_POWER_ON }
+export const updatePowerOn = (): UpdatePowerOnEvent => ({ type: UPDATE_POWER_ON })
+
 export const UPDATE_PROFILE_BRIGHT = 'BEDROOM_ONE_UPDATE_PROFILE_BRIGHT'
 export interface UpdateProfileBrightEvent { type: typeof UPDATE_PROFILE_BRIGHT }
 export const updateProfileBright = (): UpdateProfileBrightEvent => ({ type: UPDATE_PROFILE_BRIGHT })
@@ -49,6 +57,8 @@ export const updateWhiteLightOn = (): UpdateWhiteLightOnEvent => ({ type: UPDATE
 
 export type BedroomOneAction = UpdateBrightnessEvent
 | UpdateOccupancyAction
+| UpdatePowerOffEvent
+| UpdatePowerOnEvent
 | UpdateProfileBrightEvent
 | UpdateProfileColorsEvent
 | UpdateProfileDefaultEvent

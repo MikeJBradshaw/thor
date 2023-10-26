@@ -8,6 +8,8 @@ import type { WsEffect } from '@marblejs/websockets'
 import {
   UPDATE_STATE,
   UPDATE_BRIGHTNESS,
+  UPDATE_POWER_OFF,
+  UPDATE_POWER_ON,
   UPDATE_PROFILE_BRIGHT,
   UPDATE_PROFILE_COLORS,
   UPDATE_PROFILE_DEFAULT,
@@ -15,6 +17,8 @@ import {
   UPDATE_RED_LIGHT_ON,
   UPDATE_WHITE_LIGHT_ON,
   updateBrightness,
+  updatePowerOff,
+  updatePowerOn,
   updateProfileBright,
   updateProfileColors,
   updateProfileDefault,
@@ -66,10 +70,18 @@ const defaultProfile: WsEffect = event$ => event$.pipe(
   })
 )
 
-const sleepProfile: WsEffect = event$ => event$.pipe(
-  matchEvent(UPDATE_PROFILE_SLEEP),
+const powerOff: WsEffect = event$ => event$.pipe(
+  matchEvent(UPDATE_POWER_OFF),
   map(() => {
-    store.dispatch(updateProfileSleep())
+    store.dispatch(updatePowerOff())
+    return wsAck()
+  })
+)
+
+const powerOn: WsEffect = event$ => event$.pipe(
+  matchEvent(UPDATE_POWER_ON),
+  map(() => {
+    store.dispatch(updatePowerOn())
     return wsAck()
   })
 )
@@ -78,6 +90,14 @@ const redLightOn: WsEffect = event$ => event$.pipe(
   matchEvent(UPDATE_RED_LIGHT_ON),
   map(() => {
     store.dispatch(updateRedLightOn())
+    return wsAck()
+  })
+)
+
+const sleepProfile: WsEffect = event$ => event$.pipe(
+  matchEvent(UPDATE_PROFILE_SLEEP),
+  map(() => {
+    store.dispatch(updateProfileSleep())
     return wsAck()
   })
 )
@@ -104,8 +124,10 @@ export default [
   brightnessProfile,
   colorsProfile,
   defaultProfile,
-  sleepProfile,
   redLightOn,
+  sleepProfile,
+  powerOff,
+  powerOn,
   whiteLightOn,
   updateState
 ]
