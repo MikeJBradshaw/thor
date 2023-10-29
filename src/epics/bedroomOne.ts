@@ -4,10 +4,10 @@ import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
   BEDROOM_ONE_LIGHTS_GROUP,
-  // BEDROOM_ONE_LIGHT_1,
+  BEDROOM_ONE_LIGHT_1,
   BEDROOM_ONE_POWER_ONE,
   UPDATE_BRIGHTNESS,
-  // UPDATE_OCCUPANCY,
+  UPDATE_OCCUPANCY,
   UPDATE_PROFILE_BRIGHT,
   UPDATE_PROFILE_COLORS,
   UPDATE_PROFILE_DEFAULT,
@@ -21,7 +21,7 @@ import {
 } from 'actions/bedroomOne'
 import { lightOn, lightOff, noop, powerOn, powerOff } from 'actions/mqttClient'
 import {
-  // BRIGHTNESS_1,
+  BRIGHTNESS_1,
   COLOR_HOT_PINK,
   COLOR_RED_HEX,
   COLOR_TEMP_NEUTRAL,
@@ -33,7 +33,7 @@ import {
 import type { RootState } from 'store'
 import type {
   UpdateBrightnessEvent,
-  // UpdateOccupancyAction,
+  UpdateOccupancyAction,
   UpdateProfileBrightEvent,
   UpdateProfileColorsEvent,
   UpdateProfileDefaultEvent,
@@ -53,6 +53,24 @@ const brightness = (
 ): Observable<LightOn> => action$.pipe(
   ofType(UPDATE_BRIGHTNESS),
   map(() => lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness: state$.value.bedroomOne.brightness }))
+)
+
+const occupancy = (
+  action$: Observable<UpdateOccupancyAction>,
+  state$: StateObservable<RootState>
+): Observable<LightOn | LightOff | Noop> => action$.pipe(
+  ofType(UPDATE_OCCUPANCY),
+  map(() => {
+    if (!state$.value.bedroomOne.isProfileSleep) {
+      return noop()
+    }
+
+    if (!state$.value.bedroomOne.occupancy) {
+      return lightOff(BEDROOM_ONE_LIGHT_1)
+    }
+
+    return lightOn(BEDROOM_ONE_LIGHT_1, { brightness: BRIGHTNESS_1, color: { hex: COLOR_RED_HEX } })
+  })
 )
 
 const profileBrightEpic = (
@@ -186,6 +204,7 @@ const updateStateEpic = (action$: Observable<UpdateStateActions>): Observable<No
 
 export default combineEpics(
   brightness as any,
+  occupancy as any,
   profileBrightEpic as any,
   profileColorsEpic as any,
   profileDefaultEpic as any,

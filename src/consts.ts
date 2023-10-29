@@ -66,6 +66,7 @@ export const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 6
 * external APIs
 *****************************/
 export const SUNRISE_SUNSET_API = 'https://api.sunrise-sunset.org'
+export const METEO_URL = 'https://api.open-meteo.com/v1/gfs?latitude=39.1097&longitude=-95.087746&current=temperature_2m,apparent_temperature,precipitation,rain,showers,snowfall,weathercode&hourly=apparent_temperature,precipitation_probability,precipitation,snow_depth&daily=weathercode,precipitation_sum&timeformat=unixtime&timezone=America%2FChicago&forecast_days=3'
 
 /*****************************
  * general

@@ -12,6 +12,7 @@ import {
   guestBathButtonRelease,
   guestBathMotionSensor
 } from 'actions/guestBath'
+import { updateOccupancy as bedroomOneUpdateOccupancy } from 'actions/bedroomOne'
 import { masterBathMotionSensor } from 'actions/master'
 import { livingRoomButtonClick } from 'actions/livingRoom'
 import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
@@ -91,11 +92,7 @@ export const guestBathRouter = (device: string, buffer: Buffer): void => {
 }
 
 export const bedroomOneRouter = (device: string, buffer: Buffer): void => {
-  const data = JSON.parse(buffer.toString())
-  if (device === BUTTON) {
-    switch (data.action) {
-    }
-  }
+  if (device === MOTION_SENSOR) { store.dispatch(bedroomOneUpdateOccupancy(JSON.parse(buffer.toString()))) }
 }
 
 export const chickenCoopRouter = (device: string, buffer: Buffer): void => {
