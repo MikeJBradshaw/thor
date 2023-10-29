@@ -69,7 +69,7 @@ const occupancy = (
       return lightOff(BEDROOM_ONE_LIGHT_1)
     }
 
-    return lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } })
+    return lightOn(BEDROOM_ONE_LIGHT_1, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } })
   })
 )
 
