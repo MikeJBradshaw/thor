@@ -47,6 +47,14 @@ import type {
 import { bedroomOneStateSubject } from 'websocket/bedroomOneEffects'
 import type { LightOn, LightOff, Noop, PowerOn, PowerOff } from 'actions/mqttClient'
 
+const brightness = (
+  action$: Observable<UpdateBrightnessEvent>,
+  state$: StateObservable<RootState>
+): Observable<LightOn> => action$.pipe(
+  ofType(UPDATE_BRIGHTNESS),
+  map(() => lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness: state$.value.bedroomOne.brightness }))
+)
+
 const profileBrightEpic = (
   action$: Observable<UpdateProfileBrightEvent>,
   state$: StateObservable<RootState>
@@ -136,6 +144,17 @@ const powerOffEpic = (action$: Observable<UpdatePowerOffEvent>): Observable<Powe
   map(() => powerOff(BEDROOM_ONE_POWER_ONE))
 )
 
+const redLight = (
+  action$: Observable<UpdateRedLightOnEvent>,
+  state$: StateObservable<RootState>
+): Observable<LightOn> => action$.pipe(
+  ofType(UPDATE_RED_LIGHT_ON),
+  map(() => lightOn(
+    BEDROOM_ONE_LIGHTS_GROUP,
+    { brightness: state$.value.bedroomOne.brightness, color: { hex: COLOR_RED_HEX } }
+  ))
+)
+
 type UpdateStateActions = UpdateBrightnessEvent
 | UpdateProfileBrightEvent
 | UpdateProfileColorsEvent
@@ -166,6 +185,7 @@ const updateStateEpic = (action$: Observable<UpdateStateActions>): Observable<No
 )
 
 export default combineEpics(
+  brightness as any,
   profileBrightEpic as any,
   profileColorsEpic as any,
   profileDefaultEpic as any,
@@ -173,5 +193,6 @@ export default combineEpics(
   profileSleepEpic as any,
   powerOnEpic as any,
   powerOffEpic as any,
+  redLight as any,
   updateStateEpic as any
 )
