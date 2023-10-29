@@ -21,7 +21,7 @@ import {
 } from 'actions/bedroomOne'
 import { lightOn, lightOff, noop, powerOn, powerOff } from 'actions/mqttClient'
 import {
-  BRIGHTNESS_1,
+  BRIGHTNESS_LOW,
   COLOR_HOT_PINK,
   COLOR_RED_HEX,
   COLOR_TEMP_NEUTRAL,
@@ -69,7 +69,7 @@ const occupancy = (
       return lightOff(BEDROOM_ONE_LIGHT_1)
     }
 
-    return lightOn(BEDROOM_ONE_LIGHT_1, { brightness: BRIGHTNESS_1, color: { hex: COLOR_RED_HEX } })
+    return lightOn(BEDROOM_ONE_LIGHTS_GROUP, { brightness: BRIGHTNESS_LOW, color: { hex: COLOR_RED_HEX } })
   })
 )
 
