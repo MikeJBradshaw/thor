@@ -3,8 +3,6 @@ import { webSocketListener, createWebSocketServer } from '@marblejs/websockets'
 import type { IO } from 'fp-ts/lib/IO'
 import type { MqttClient } from 'mqtt'
 
-// import {
-// } from 'actions/bedroomOne'
 import { motionSensor } from 'actions/laundry' // TODO: fix this naming
 import {
   guestBathButtonClick,
@@ -34,9 +32,10 @@ import {
   TEMP_HUMIDITY,
   TEST
 } from 'consts'
-import websocketEffects from 'websocket/websocketEffects'
-import masterBathEffects from 'websocket/masterBathEffects'
 import bedroomOneEffects from 'websocket/bedroomOneEffects'
+import masterBathEffects from 'websocket/masterBathEffects'
+import weatherEffects from 'websocket/weatherEffects'
+import websocketEffects from 'websocket/websocketEffects'
 import store from 'store'
 import config from '../configuration.json'
 
@@ -191,7 +190,7 @@ store.subscribe(() => {
     return
   }
 
-  const { mqttPublishClientReducer, ...printableState } = store.getState()
+  const { mqttPublishClient, ...printableState } = store.getState()
   console.log(printableState)
 })
 
@@ -202,7 +201,8 @@ if (config.websocketServer !== undefined) {
   const effects = [
     ...websocketEffects,
     ...masterBathEffects,
-    ...bedroomOneEffects
+    ...bedroomOneEffects,
+    ...weatherEffects
   ]
 
   const { host, port } = config.websocketServer

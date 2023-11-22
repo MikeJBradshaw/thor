@@ -24,10 +24,9 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6"
   },
-  "name": "VALHALLA",
-  "version": "0.0.3.rc",
-  "description": "Versatile Automation and Lifestyle Hub with Advanced Lighting and Logic Assistance (VALHALLA)",
-  "main": "app.ts",
+  "name": "ASGARD",
+  "version": "0.0.4",
+  "description": "Advanced Smart Gateway for Automation and Residential Dwelling (ASGARD)",
   "scripts": {
     "build": "tsc -p .",
     "startWithWatch": "npm run build -- -w",

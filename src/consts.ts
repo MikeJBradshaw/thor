@@ -54,6 +54,7 @@ export const MINUTES_2_IN_MSEC = 120000
 export const MINUTES_5_IN_MSEC = 300000
 export const MINUTES_10_IN_MSEC = 600000
 export const MINUTES_20_IN_MSEC = 1200000
+export const MINUTES_60_IN_MSEC = 3600000
 export const MINUTES_15_IN_SEC = 900
 export const MINUTES_30_IN_SEC = 1800
 export const MINUTES_60_IN_SEC = 3600
@@ -66,7 +67,7 @@ export const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 6
 * external APIs
 *****************************/
 export const SUNRISE_SUNSET_API = 'https://api.sunrise-sunset.org'
-export const METEO_URL = 'https://api.open-meteo.com/v1/gfs?latitude=39.1097&longitude=-95.087746&current=temperature_2m,apparent_temperature,precipitation,rain,showers,snowfall,weathercode&hourly=apparent_temperature,precipitation_probability,precipitation,snow_depth&daily=weathercode,precipitation_sum&timeformat=unixtime&timezone=America%2FChicago&forecast_days=3'
+export const METEO_URL = 'https://api.open-meteo.com/v1/forecast?latitude=39.1097&longitude=-95.0877&current=apparent_temperature,precipitation,weather_code&hourly=apparent_temperature,precipitation_probability,precipitation,weather_code&daily=weather_code,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max&wind_speed_unit=mph&precipitation_unit=inch&timeformat=unixtime&timezone=America%2FChicago&forecast_days=3'
 
 /*****************************
  * general
@@ -79,6 +80,12 @@ export const BUTTON_STATE_RELEASE = 'release'
 export const ROOM_STATE_DEFAULT = 'default'
 export const ROOM_STATE_SINGLE = 'single'
 export const ROOM_STATE_DOUBLE = 'double'
+
+/*****************************
+ * weather
+ * **************************/
+export const WARNING_WEATHER_CODES = [65, 66, 67, 73, 75, 82, 95]
+export const PING_NOAA_WEATHER_CODES = [56, 57, 66, 67, 73, 75, 81, 82, 95]
 
 /*****************************
  * light colors

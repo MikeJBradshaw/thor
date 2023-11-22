@@ -8,6 +8,7 @@ import {
   SUPERVISOR_INIT,
   NETWORK_ERROR,
   NETWORK_END_RESTART,
+  SET_SUNRISE_SUNSET,
   homeLowEnergy,
   networkCheck,
   networkError,
@@ -19,6 +20,7 @@ import {
 import { powerOn, powerOff, noop } from 'actions/mqttClient'
 import type {
   HomeLowEnergyAction,
+  HomeEveningModeAction,
   NetworkCheckAction,
   NetworkErrorAction,
   NetworkRestartAction,
@@ -67,8 +69,8 @@ const networkErrorEpic = (
 ): NetworkErrorEpicReturnType => action$.pipe(
   ofType(NETWORK_ERROR),
   switchMap(() => {
-    const lastNetworkUpdate: number = state$.value.supervisorReducer.lastSuccessfulInternetCheck
-    const currentRestarting: boolean = state$.value.supervisorReducer.networkRestart
+    const lastNetworkUpdate: number = state$.value.supervisor.lastSuccessfulInternetCheck
+    const currentRestarting: boolean = state$.value.supervisor.networkRestart
 
     if ((getCurrentEpoch() - lastNetworkUpdate > NETWORK_NO_RESPONSE_TIMEOUT) && !currentRestarting) {
       return concat(
@@ -135,6 +137,17 @@ export const lowEnergyStateEpic = (
     map(() => homeLowEnergy())
   ))
 )
+
+/*****************
+ * System alert for sunset - this alert fires 30 min before sunset so that the systems can take any actions needed
+ * ***************/
+// export const sunsetEpic = (
+//   action$: Observable<SetSunriseSunsetAction>,
+//   state$: StateObservable<RootState>
+// ): Observable<HomeEveningModeAction> => action$.pipe(
+//   ofType(SET_SUNRISE_SUNSET),
+//   switchMap(() => timer(deltaToTimeMsec(state$.value.supervisor.sunData.sunset + MINUTES_30_IN_MSEC)))
+// )
 
 export default combineEpics(
   lowEnergyStateEpic as any,

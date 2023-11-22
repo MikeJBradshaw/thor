@@ -14,6 +14,14 @@ export const HOME_SET_BEDTIME = 'SUPERVISOR_HOME_SET_BEDTIME'
 export interface HomeSetBedtimeAction { type: typeof HOME_SET_BEDTIME }
 export const homeSetBedtime = (): HomeSetBedtimeAction => ({ type: HOME_SET_BEDTIME })
 
+export const HOME_EVENING_MODE = 'SUPERVISOR_HOME_EVENING_MODE'
+export interface HomeEveningModeAction { type: typeof HOME_EVENING_MODE }
+export const homeEveningMode = (): HomeEveningModeAction => ({ type: HOME_EVENING_MODE })
+
+export const IS_SUNRISE = 'SCHEDULER_IS_SUNRISE'
+export interface IsSunriseAction { type: typeof IS_SUNRISE }
+export const eventIsDay = (): IsSunriseAction => ({ type: IS_SUNRISE })
+
 export const NETWORK_CHECK = 'SUPERVISOR_NETWORK_CHECK'
 export interface NetworkCheckAction { type: typeof NETWORK_CHECK, responseEpoch: number }
 export const networkCheck = (responseEpoch: number): NetworkCheckAction => ({ type: NETWORK_CHECK, responseEpoch })
@@ -56,6 +64,8 @@ export type SupervisorAction = SupervisorInitAction
 | SupervisorErrorAction
 | HomeLowEnergyAction
 | HomeSetBedtimeAction
+| HomeEveningModeAction
+| IsSunriseAction
 | NetworkCheckAction
 | NetworkEndRestartAction
 | NetworkErrorAction

@@ -16,7 +16,7 @@ const motionSensorEpic = (
 ): MotionSensorEpicReturnType => action$.pipe(
   ofType(MOTION_SENSOR),
   switchMap(({ payload: { occupancy } }) => {
-    if (state$.value.laundryReducer.overrideLights) {
+    if (state$.value.laundry.overrideLights) {
       return of(noop())
     } else {
       if (occupancy) {

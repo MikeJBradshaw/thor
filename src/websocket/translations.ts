@@ -1,10 +1,12 @@
 import type { BedroomOneState } from 'reducers/bedroomOne'
 import type { MasterState } from 'reducers/master'
+import type { WeatherState } from 'reducers/weather'
 
 export const APP_INIT = 'APP_INIT'
+export const BEDROOM_ONE_INIT = 'BEDROOM_ONE_INIT'
 export const CLIENT_HEARTBEAT = 'CLIENT_HEARTBEAT'
 export const MASTER_BATH_INIT = 'MASTER_BATH_INIT'
-export const BEDROOM_ONE_INIT = 'BEDROOM_ONE_INIT'
+export const WEATHER_INIT = 'WEATHER_INIT'
 export const MASTER_BATH_UPDATE_PROFILE_MANUAL = 'MASTER_BATH_UPDATE_PROFILE_MANUAL'
 export const MASTER_BATH_UPDATE_PROFILE_SENSOR = 'MASTER_BATH_UPDATE_PROFILE_SENSOR'
 export const MASTER_BATH_UPDATE_PROFILE_SHOWER = 'MASTER_BATH_UPDATE_PROFILE_SHOWER'
@@ -38,3 +40,9 @@ export interface WSUpdateStateEvent { type: typeof WS_UPDATE_MASTER_BATH_STATE, 
 export const wsUpdateMasterBathState = (
   payload: MasterState
 ): WSUpdateStateEvent => ({ type: WS_UPDATE_MASTER_BATH_STATE, payload })
+
+export const WS_UPDATE_WEATHER_STATE = 'WS_UPDATE_WEATHER_STATE'
+export interface WSUpdateWeatherStateEvent { type: typeof WS_UPDATE_WEATHER_STATE, payload: WeatherState }
+export const wsUpdateWeatherState = (
+  payload: WeatherState
+): WSUpdateWeatherStateEvent => ({ type: WS_UPDATE_WEATHER_STATE, payload })

@@ -42,8 +42,8 @@ const motionSensorEpic = (
   ofType(GUEST_BATH_MOTION_SENSOR),
   switchMap(({ payload: { occupancy } }) => {
     if (
-      state$.value.guestBathReducer.overrideGuestBathLights ||
-      state$.value.guestBathReducer.overrideGuestBathMotionSensor
+      state$.value.guestBath.overrideGuestBathLights ||
+      state$.value.guestBath.overrideGuestBathMotionSensor
     ) {
       return of(noop())
     } else {
@@ -97,7 +97,7 @@ const buttonClickEpic = (
 ): ButtonClickEpicReturnType => action$.pipe(
   ofType(GUEST_BATH_BUTTON_CLICK),
   switchMap(() => {
-    const buttonAction = state$.value.guestBathReducer.buttonState.action
+    const buttonAction = state$.value.guestBath.buttonState.action
     if (buttonAction === ROOM_STATE_SINGLE) {
       return of(lightOn(GUEST_BATH_LIGHTS_GROUP, { brightness: BRIGHTNESS_HIGH, color_temp: COLOR_TEMP_NEUTRAL }))
     }

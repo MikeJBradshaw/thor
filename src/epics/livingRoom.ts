@@ -34,7 +34,7 @@ const buttonClickEpic = (
   ofType(LIVING_ROOM_BUTTON_CLICK),
   map(() => {
     // TODO: what if its night?
-    const power = state$.value.livingRoomReducer.lightPower
+    const power = state$.value.livingRoom.lightPower
     return lightOn(
       LIVING_ROOM_LIGHTS_GROUP,
       { brightness: power }
@@ -50,21 +50,21 @@ const dimDownEpic = (
   ofType(SET_SUNRISE_SUNSET),
   switchMap(() => {
     const currentEpoch = getCurrentEpoch()
-    if (currentEpoch > state$.value.supervisorReducer.sunData.civilTwilightEnd) { return of(noop()) }
+    if (currentEpoch > state$.value.supervisor.sunData.civilTwilightEnd) { return of(noop()) }
 
     // we are past sunset but before civilTwilightEnd
-    if (currentEpoch > state$.value.supervisorReducer.sunData.sunset) {
+    if (currentEpoch > state$.value.supervisor.sunData.sunset) {
       return of(
         lightOff(LIVING_ROOM_LIGHT_ONE),
         lightOn(
           LIVING_ROOM_LIGHT_TWO,
-          { brightness: 1, transition: deltaToTime(state$.value.supervisorReducer.sunData.civilTwilightEnd) }
+          { brightness: 1, transition: deltaToTime(state$.value.supervisor.sunData.civilTwilightEnd) }
         )
       )
     }
 
     // we are before sunset
-    const idealStartTime = state$.value.supervisorReducer.sunData.sunset - MINUTES_60_IN_SEC
+    const idealStartTime = state$.value.supervisor.sunData.sunset - MINUTES_60_IN_SEC
     return timer(currentEpoch < idealStartTime ? deltaToTimeMsec(idealStartTime) : 0).pipe(
       switchMap(() => concat(
         of(lightOn(
@@ -72,17 +72,17 @@ const dimDownEpic = (
           {
             brightness: BRIGHTNESS_HIGH,
             color_temp: COLOR_TEMP_WARM,
-            transition: deltaToTime(state$.value.supervisorReducer.sunData.sunset - MINUTES_30_IN_SEC)
+            transition: deltaToTime(state$.value.supervisor.sunData.sunset - MINUTES_30_IN_SEC)
           }
         )),
-        timer(deltaToTimeMsec(state$.value.supervisorReducer.sunData.sunset)).pipe(
+        timer(deltaToTimeMsec(state$.value.supervisor.sunData.sunset)).pipe(
           switchMap(() => concat(
             of(lightOff(LIVING_ROOM_LIGHT_ONE, MINUTES_15_IN_SEC)),
             of(lightOn(
               LIVING_ROOM_LIGHT_TWO,
               {
                 brightness: BRIGHTNESS_LOW,
-                transition: deltaToTime(state$.value.supervisorReducer.sunData.civilTwilightEnd)
+                transition: deltaToTime(state$.value.supervisor.sunData.civilTwilightEnd)
               }
             )),
             timer(deltaToTimeMsec(epochPastmidnight({ hours: 2 }))).pipe(map(() => lightOff(LIVING_ROOM_LIGHT_TWO)))
