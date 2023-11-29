@@ -2,13 +2,14 @@ import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { combineEpics, createEpicMiddleware } from 'redux-observable'
 import bedroomOne from 'reducers/bedroomOne'
 import mqttPublishClient from 'reducers/mqttClient'
-import laundry from 'reducers/laundry'
 import masterBath from 'reducers/master'
 import chickenCoop from 'reducers/chickenCoop'
 import guestBath from 'reducers/guestBath'
+import hallway from 'reducers/hallway'
+import laundry from 'reducers/laundry'
+import livingRoom from 'reducers/livingRoom'
 import scheduler from 'reducers/scheduler'
 import supervisor from 'reducers/supervisor'
-import livingRoom from 'reducers/livingRoom'
 import weather from 'reducers/weather'
 import bedroomOneEpic from 'epics/bedroomOne'
 import laundryEpic from 'epics/laundry'
@@ -23,6 +24,7 @@ const reducers = combineReducers({
   bedroomOne,
   chickenCoop,
   guestBath,
+  hallway,
   laundry,
   livingRoom,
   mqttPublishClient,

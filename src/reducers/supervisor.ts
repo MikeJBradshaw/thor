@@ -1,11 +1,6 @@
 import type { Reducer } from 'redux'
 
-import {
-  NETWORK_CHECK,
-  SET_SUNRISE_SUNSET,
-  NETWORK_END_RESTART,
-  NETWORK_RESTART
-} from 'actions/supervisor'
+import { NETWORK_CHECK, SET_SUNRISE_SUNSET, NETWORK_END_RESTART, NETWORK_RESTART } from 'actions/supervisor'
 import { dateToEpoch } from 'helpers/helpers'
 import type { SupervisorAction } from 'actions/supervisor'
 import type { SunData } from 'types/payloads'
