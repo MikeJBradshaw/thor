@@ -1,5 +1,5 @@
 export const ALL_KITCHEN_POWER = 'z2m/kitchen-power'
-export const KITCHEN_NIGHT_LIGHT = 'z2m/kitchen-night-light'
+export const KITCHEN_NIGHT_LIGHT = 'z2m/kitchen-night-lights'
 
 export const BRIGHT_PROFILE = 'KITCHEN_BRIGHT_PROFILE'
 export interface BrightProfileAction { type: typeof BRIGHT_PROFILE }
