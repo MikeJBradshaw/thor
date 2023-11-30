@@ -13,11 +13,14 @@ import {
   UPDATE_RED_LIGHT_ON,
   UPDATE_WHITE_LIGHT_ON
 } from 'actions/bedroomOne'
+import { IS_SUNRISE } from 'actions/supervisor'
 import { BRIGHTNESS_OFF } from 'consts'
 import type { BedroomOneAction } from 'actions/bedroomOne'
+import type { SupervisorAction } from 'actions/supervisor'
 
 export interface BedroomOneState {
   brightness: number
+  isDay: boolean
   isProfileBright: boolean
   isProfileColors: boolean
   isProfileDefault: boolean
@@ -31,6 +34,7 @@ export interface BedroomOneState {
 
 const initState: BedroomOneState = {
   brightness: BRIGHTNESS_OFF,
+  isDay: true,
   isProfileBright: false,
   isProfileColors: false,
   isProfileDefault: true,
@@ -42,8 +46,11 @@ const initState: BedroomOneState = {
   power: false
 }
 
-const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction> = (state = initState, action) => {
+const bedroomOneReducer: Reducer<BedroomOneState, BedroomOneAction | SupervisorAction> = (state = initState, action) => { // eslint-disable-line
   switch (action.type) {
+    case IS_SUNRISE:
+      return { ...state, isDay: true }
+
     case UPDATE_BRIGHTNESS:
       return { ...state, brightness: action.payload }
 

@@ -38,6 +38,15 @@ export const epochPastmidnight = (
 ): number => DateTime.now().endOf('day').plus(obj).toUnixInteger()
 
 /**
+ * @remarks calculates the unix epoch hours/minutes until midnight
+ *
+ * @returns number: the unix epoch time for specified time until midnight
+ */
+export const epochUntilmidnight = (
+  obj: DateObject
+): number => DateTime.now().endOf('day').minus(obj).toUnixInteger()
+
+/**
  * @remarks gets the current local epoch
  *
  * @returns number: the current local epoch

@@ -1,6 +1,6 @@
 import { ofType, combineEpics } from 'redux-observable'
 import { Observable, interval, of, timer, concat } from 'rxjs'
-import { catchError, map, switchMap, tap } from 'rxjs/operators'
+import { catchError, map, switchMap } from 'rxjs/operators'
 import { fromFetch } from 'rxjs/fetch'
 import type { StateObservable } from 'redux-observable'
 
@@ -9,28 +9,32 @@ import {
   NETWORK_ERROR,
   NETWORK_END_RESTART,
   SET_SUNRISE_SUNSET,
+  isSunrise,
   homeLowEnergy,
   networkCheck,
   networkError,
-  setSunriseSunset,
   networkRestart,
   networkEndRestart,
+  nightMode,
+  setSunriseSunset,
   supervisorError
 } from 'actions/supervisor'
 import { powerOn, powerOff, noop } from 'actions/mqttClient'
 import type {
   HomeLowEnergyAction,
-  HomeEveningModeAction,
+  // HomeEveningModeAction,
+  IsSunriseAction,
   NetworkCheckAction,
   NetworkErrorAction,
   NetworkRestartAction,
   NetworkEndRestartAction,
+  NightModeAction,
   SetSunriseSunsetAction,
   SupervisorErrorAction,
   SupervisorInitAction
 } from 'actions/supervisor'
 import { MASTER_BEDROOM_POWER_ROUTER, MASTER_BEDROOM_POWER_MODEM } from 'actions/master'
-import { deltaToTimeMsec, epochPastmidnight, getCurrentEpoch } from 'helpers/helpers'
+import { deltaToTimeMsec, epochPastmidnight, epochUntilmidnight, getCurrentEpoch } from 'helpers/helpers'
 import {
   HOURS_24_IN_MSEC,
   MINUTES_1_IN_MSEC,
@@ -103,7 +107,7 @@ const networkErrorEpic = (
  * @remarks This will query upon start, the delta to 3am, then every 3am after
  */
 type SunriseSunsetEpicResponseType = Observable<SetSunriseSunsetAction | SupervisorErrorAction>
-export const sunriseSunsetEpic = (
+const sunriseSunsetEpic = (
   action$: Observable<SupervisorInitAction>
 ): SunriseSunsetEpicResponseType => action$.pipe(
   ofType(SUPERVISOR_INIT),
@@ -129,7 +133,7 @@ export const sunriseSunsetEpic = (
   ))
 )
 
-export const lowEnergyStateEpic = (
+const lowEnergyStateEpic = (
   action$: Observable<SupervisorInitAction>
 ): Observable<HomeLowEnergyAction> => action$.pipe(
   ofType(SUPERVISOR_INIT),
@@ -141,17 +145,38 @@ export const lowEnergyStateEpic = (
 /*****************
  * System alert for sunset - this alert fires 30 min before sunset so that the systems can take any actions needed
  * ***************/
-// export const sunsetEpic = (
+// const sunsetEpic = (
 //   action$: Observable<SetSunriseSunsetAction>,
 //   state$: StateObservable<RootState>
 // ): Observable<HomeEveningModeAction> => action$.pipe(
 //   ofType(SET_SUNRISE_SUNSET),
-//   switchMap(() => timer(deltaToTimeMsec(state$.value.supervisor.sunData.sunset + MINUTES_30_IN_MSEC)))
+//   switchMap(() => timer(deltaToTimeMsec(state$.value.supervisor.sunData.sunset + MINUTES_30_IN_MSEC)).pipe(
+//     map(() => )
+//   ))
 // )
+
+const sunriseEpic = (
+  action$: Observable<SetSunriseSunsetAction>,
+  state$: StateObservable<RootState>
+): Observable<IsSunriseAction> => action$.pipe(
+  ofType(SET_SUNRISE_SUNSET),
+  switchMap(() => timer(deltaToTimeMsec(state$.value.supervisor.sunData.sunrise)).pipe(
+    map(() => isSunrise())
+  ))
+)
+
+const nightModeEpic = (action$: Observable<SupervisorInitAction>): Observable<NightModeAction> => action$.pipe(
+  ofType(SUPERVISOR_INIT),
+  switchMap(() => timer(deltaToTimeMsec(epochUntilmidnight({ hours: 2 })), HOURS_24_IN_MSEC).pipe(
+    map(() => nightMode())
+  ))
+)
 
 export default combineEpics(
   lowEnergyStateEpic as any,
   networkCheckEpic as any,
   networkErrorEpic as any,
-  sunriseSunsetEpic as any
+  nightModeEpic as any,
+  sunriseSunsetEpic as any,
+  sunriseEpic as any
 )
