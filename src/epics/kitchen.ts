@@ -3,15 +3,23 @@ import { map } from 'rxjs/operators'
 import type { Observable } from 'rxjs'
 import type { StateObservable } from 'redux-observable'
 
-import { NIGHT_MODE } from 'actions/supervisor'
+import { IS_SUNRISE, NIGHT_MODE } from 'actions/supervisor'
 import { KITCHEN_NIGHT_LIGHT } from 'actions/kitchen'
 import { lightOn } from 'actions/mqttClient'
-import { COLOR_RED_HEX } from 'consts'
-import type { NightModeAction } from 'actions/supervisor'
+import { COLOR_RED_HEX, COLOR_TEMP_WARM } from 'consts'
+import type { IsSunriseAction, NightModeAction } from 'actions/supervisor'
 import type { LightOn } from 'actions/mqttClient'
 import type { RootState } from 'store'
 
-const kitchenBedtimeEpic = (
+const kitchenSunriseEpic = (
+  action$: Observable<IsSunriseAction>,
+  state$: StateObservable<RootState>
+): Observable<LightOn> => action$.pipe(
+  ofType(IS_SUNRISE),
+  map(() => lightOn(KITCHEN_NIGHT_LIGHT, { brightness: 254, color_temp: COLOR_TEMP_WARM }))
+)
+
+const kitchenNightModeEpic = (
   action$: Observable<NightModeAction>,
   state$: StateObservable<RootState>
 ): Observable<LightOn> => action$.pipe(
@@ -19,4 +27,7 @@ const kitchenBedtimeEpic = (
   map(() => lightOn(KITCHEN_NIGHT_LIGHT, { brightness: 10, color: { hex: COLOR_RED_HEX } }))
 )
 
-export default combineEpics(kitchenBedtimeEpic as any)
+export default combineEpics(
+  kitchenSunriseEpic as any,
+  kitchenNightModeEpic as any
+)
