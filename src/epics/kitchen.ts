@@ -24,7 +24,7 @@ const kitchenNightModeEpic = (
   state$: StateObservable<RootState>
 ): Observable<LightOn> => action$.pipe(
   ofType(NIGHT_MODE),
-  map(() => lightOn(KITCHEN_NIGHT_LIGHT, { brightness: 10, color: { hex: COLOR_RED_HEX } }))
+  map(() => lightOn(KITCHEN_NIGHT_LIGHT, { brightness: 35, color: { hex: COLOR_RED_HEX } }))
 )
 
 export default combineEpics(
