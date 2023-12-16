@@ -58,9 +58,11 @@ export const MINUTES_60_IN_MSEC = 3600000
 export const MINUTES_15_IN_SEC = 900
 export const MINUTES_30_IN_SEC = 1800
 export const MINUTES_60_IN_SEC = 3600
+export const SECONDS_1_POINT_5 = 1.5
 export const SECONDS_2 = 2
 export const SECONDS_5 = 5
 export const SECONDS_6_IN_MSEC = 6000
+export const SECONDS_2_IN_MSEC = 12000
 export const NETWORK_NO_RESPONSE_TIMEOUT = 1000 * 60 * 6
 
 /*****************************

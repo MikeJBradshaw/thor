@@ -36,6 +36,7 @@ import bedroomOneEffects from 'websocket/bedroomOneEffects'
 import masterBathEffects from 'websocket/masterBathEffects'
 import weatherEffects from 'websocket/weatherEffects'
 import websocketEffects from 'websocket/websocketEffects'
+import livingRoomEffects from 'websocket/livingRoomEffects'
 import store from 'store'
 import config from '../configuration.json'
 
@@ -109,6 +110,7 @@ const livingRoomRouter = (device: string, buffer: Buffer): void => {
     switch (data.action) {
       case BUTTON_STATE_SINGLE:
       case BUTTON_STATE_DOUBLE:
+      case BUTTON_STATE_HOLD:
         store.dispatch(livingRoomButtonClick(data))
     }
   }
@@ -199,10 +201,11 @@ store.subscribe(() => {
  * *************/
 if (config.websocketServer !== undefined) {
   const effects = [
-    ...websocketEffects,
-    ...masterBathEffects,
     ...bedroomOneEffects,
-    ...weatherEffects
+    ...livingRoomEffects,
+    ...masterBathEffects,
+    ...weatherEffects,
+    ...websocketEffects
   ]
 
   const { host, port } = config.websocketServer

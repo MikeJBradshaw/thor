@@ -11,4 +11,22 @@ export const livingRoomButtonClick = (
   payload: ButtonPayload
 ): LivingRoomButtonClickAction => ({ type: LIVING_ROOM_BUTTON_CLICK, payload })
 
+export const UPDATE_PROFILE_DEFAULT = 'LIVING_ROOM_UPDATE_PROFILE_DEFAULT'
+export interface UpdateProfileDefaultEvent { type: typeof UPDATE_PROFILE_DEFAULT }
+export const updateProfileDefault = (): UpdateProfileDefaultEvent => ({ type: UPDATE_PROFILE_DEFAULT })
+
+export const UPDATE_PROFILE_RAINBOW = 'LIVING_ROOM_UPDATE_PROFILE_RAINBOW'
+export interface UpdateProfileRainbowEvent { type: typeof UPDATE_PROFILE_RAINBOW }
+export const updateProfileRainbow = (): UpdateProfileRainbowEvent => ({ type: UPDATE_PROFILE_RAINBOW })
+
+export const UPDATE_STATE = 'LIVING_ROOM_UPDATE_STATE'
+export interface UpdateStateAction { type: typeof UPDATE_STATE }
+export const updateState = (): UpdateStateAction => ({ type: UPDATE_STATE })
+
 export type LivingRoomAction = LivingRoomButtonClickAction
+| UpdateProfileDefaultEvent
+| UpdateProfileRainbowEvent
+| UpdateStateAction
+
+export type LivingRoomUpdatable = UpdateProfileDefaultEvent
+| UpdateProfileRainbowEvent

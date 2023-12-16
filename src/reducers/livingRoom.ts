@@ -1,17 +1,21 @@
 import type { Reducer } from 'redux'
 
-import { LIVING_ROOM_BUTTON_CLICK } from 'actions/livingRoom'
+import { LIVING_ROOM_BUTTON_CLICK, UPDATE_PROFILE_DEFAULT, UPDATE_PROFILE_RAINBOW } from 'actions/livingRoom'
 import { BRIGHTNESS_LOW, BRIGHTNESS_HIGH, BRIGHTNESS_OFF } from 'consts'
 import type { LivingRoomAction } from 'actions/livingRoom'
 import type { ButtonPayload } from 'types/payloads'
 
-interface LivingRoomState {
+export interface LivingRoomState {
+  isProfileDefault: boolean
+  isProfileRainbow: boolean
   overrideLivingRoomLights: boolean
   lightPower: number
   buttonState: ButtonPayload
 }
 
 const initState: LivingRoomState = {
+  isProfileDefault: true,
+  isProfileRainbow: false,
   overrideLivingRoomLights: false,
   lightPower: BRIGHTNESS_OFF,
   buttonState: {
@@ -21,23 +25,49 @@ const initState: LivingRoomState = {
   }
 }
 
-const livingRoomReducer: Reducer<LivingRoomState, LivingRoomAction> = (state = initState, action) => {
+const livingRoomReducer: Reducer<LivingRoomState, LivingRoomAction> = (state = initState, action) => { // eslint-disable-line
   switch (action.type) {
     case LIVING_ROOM_BUTTON_CLICK: {
-      if (action.payload.action === 'double' && state.lightPower !== BRIGHTNESS_OFF) {
+      if (action.payload.action === 'hold') {
+        if (state.isProfileDefault) {
+          return {
+            ...state,
+            isProfileRainbow: true,
+            isProfileDefault: false
+          }
+        }
+
         return {
           ...state,
-          buttonState: action.payload,
-          lightPower: state.lightPower === BRIGHTNESS_HIGH ? BRIGHTNESS_LOW : BRIGHTNESS_HIGH
+          isProfileRainbow: false,
+          isProfileDefault: true
         }
       }
 
-      return {
-        ...state,
-        buttonState: action.payload,
-        lightPower: state.lightPower === BRIGHTNESS_OFF ? BRIGHTNESS_HIGH : BRIGHTNESS_OFF
+      if (state.isProfileDefault) {
+        if (action.payload.action === 'double' && state.lightPower !== BRIGHTNESS_OFF) {
+          return {
+            ...state,
+            buttonState: action.payload,
+            lightPower: state.lightPower === BRIGHTNESS_HIGH ? BRIGHTNESS_LOW : BRIGHTNESS_HIGH
+          }
+        }
+
+        return {
+          ...state,
+          buttonState: action.payload,
+          lightPower: state.lightPower === BRIGHTNESS_OFF ? BRIGHTNESS_HIGH : BRIGHTNESS_OFF
+        }
       }
+
+      return state
     }
+
+    case UPDATE_PROFILE_DEFAULT:
+      return { ...state, isProfileDefault: true, isProfileRainbow: false }
+
+    case UPDATE_PROFILE_RAINBOW:
+      return { ...state, isProfileRainbow: true, isProfileDefault: false }
 
     default:
       return state
