@@ -1,6 +1,11 @@
 import type { Reducer } from 'redux'
 
-import { LIVING_ROOM_BUTTON_CLICK, UPDATE_PROFILE_DEFAULT, UPDATE_PROFILE_RAINBOW } from 'actions/livingRoom'
+import {
+  LIVING_ROOM_BUTTON_CLICK,
+  LIVING_ROOM_BUTTON_HOLD,
+  UPDATE_PROFILE_DEFAULT,
+  UPDATE_PROFILE_RAINBOW
+} from 'actions/livingRoom'
 import { BRIGHTNESS_LOW, BRIGHTNESS_HIGH, BRIGHTNESS_OFF } from 'consts'
 import type { LivingRoomAction } from 'actions/livingRoom'
 import type { ButtonPayload } from 'types/payloads'
@@ -28,22 +33,6 @@ const initState: LivingRoomState = {
 const livingRoomReducer: Reducer<LivingRoomState, LivingRoomAction> = (state = initState, action) => { // eslint-disable-line
   switch (action.type) {
     case LIVING_ROOM_BUTTON_CLICK: {
-      if (action.payload.action === 'hold') {
-        if (state.isProfileDefault) {
-          return {
-            ...state,
-            isProfileRainbow: true,
-            isProfileDefault: false
-          }
-        }
-
-        return {
-          ...state,
-          isProfileRainbow: false,
-          isProfileDefault: true
-        }
-      }
-
       if (state.isProfileDefault) {
         if (action.payload.action === 'double' && state.lightPower !== BRIGHTNESS_OFF) {
           return {
@@ -61,6 +50,22 @@ const livingRoomReducer: Reducer<LivingRoomState, LivingRoomAction> = (state = i
       }
 
       return state
+    }
+
+    case LIVING_ROOM_BUTTON_HOLD: {
+      if (state.isProfileDefault) {
+        return {
+          ...state,
+          isProfileRainbow: true,
+          isProfileDefault: false
+        }
+      }
+
+      return {
+        ...state,
+        isProfileRainbow: false,
+        isProfileDefault: true
+      }
     }
 
     case UPDATE_PROFILE_DEFAULT:

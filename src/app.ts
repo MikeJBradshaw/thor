@@ -12,7 +12,7 @@ import {
 } from 'actions/guestBath'
 import { updateOccupancy as bedroomOneUpdateOccupancy } from 'actions/bedroomOne'
 import { masterBathMotionSensor } from 'actions/master'
-import { livingRoomButtonClick } from 'actions/livingRoom'
+import { livingRoomButtonClick, livingRoomButtonHold, livingRoomButtonRelease } from 'actions/livingRoom'
 import { temperatureHumidity } from 'actions/chickenCoop' // TODO: fix this naming
 import { supervisorInit } from 'actions/supervisor'
 import {
@@ -110,8 +110,11 @@ const livingRoomRouter = (device: string, buffer: Buffer): void => {
     switch (data.action) {
       case BUTTON_STATE_SINGLE:
       case BUTTON_STATE_DOUBLE:
-      case BUTTON_STATE_HOLD:
         store.dispatch(livingRoomButtonClick(data))
+      case BUTTON_STATE_HOLD:
+        store.dispatch(livingRoomButtonHold())
+      case BUTTON_STATE_RELEASE:
+        store.dispatch(livingRoomButtonRelease())
     }
   }
 }

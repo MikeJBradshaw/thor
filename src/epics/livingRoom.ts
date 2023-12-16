@@ -4,6 +4,7 @@ import { combineEpics, ofType, StateObservable } from 'redux-observable'
 
 import {
   LIVING_ROOM_BUTTON_CLICK,
+  LIVING_ROOM_BUTTON_RELEASE,
   LIVING_ROOM_LIGHTS_GROUP,
   LIVING_ROOM_LIGHT_ONE,
   LIVING_ROOM_LIGHT_TWO,
@@ -11,6 +12,7 @@ import {
   UPDATE_PROFILE_DEFAULT,
   UPDATE_PROFILE_RAINBOW,
   updateState,
+  updateProfileDefault,
   updateProfileRainbow
 } from 'actions/livingRoom'
 import { SET_SUNRISE_SUNSET, HOME_LOW_ENERGY } from 'actions/supervisor'
@@ -32,6 +34,7 @@ import {
 } from 'consts'
 import type {
   LivingRoomButtonClickAction,
+  LivingRoomButtonReleaseEvent,
   LivingRoomUpdatable,
   UpdateProfileDefaultEvent,
   UpdateProfileRainbowEvent
@@ -40,23 +43,20 @@ import type { LightOn, LightOff, PowerOff, PowerOn, Noop } from 'actions/mqttCli
 import type { SetSunriseSunsetAction, HomeLowEnergyAction } from 'actions/supervisor'
 import type { RootState } from 'store'
 
-type ButtonClickEpicReturnType = Observable<LightOn | UpdateProfileRainbowEvent>
 const buttonClickEpic = (
   action$: Observable<LivingRoomButtonClickAction>,
   state$: StateObservable<RootState>
-): ButtonClickEpicReturnType => action$.pipe(
+): Observable<LightOn> => action$.pipe(
   ofType(LIVING_ROOM_BUTTON_CLICK),
-  map(() => {
-    if (state$.value.livingRoom.isProfileRainbow) { return updateProfileRainbow() }
+  map(() => lightOn(LIVING_ROOM_LIGHTS_GROUP, { brightness: state$.value.livingRoom.lightPower }))
+)
 
-    else {
-      const power = state$.value.livingRoom.lightPower
-      return lightOn(
-        LIVING_ROOM_LIGHTS_GROUP,
-        { brightness: power }
-      )
-    }
-  })
+const buttonReleaseEpic = (
+  action$: Observable<LivingRoomButtonReleaseEvent>,
+  state$: StateObservable<RootState>
+): Observable<UpdateProfileDefaultEvent | UpdateProfileRainbowEvent> => action$.pipe(
+  ofType(LIVING_ROOM_BUTTON_RELEASE),
+  map(() => state$.value.livingRoom.isProfileRainbow ? updateProfileRainbow() : updateProfileDefault())
 )
 
 type DimDownEpicReturnType = Observable<LightOn | LightOff | Noop>
@@ -164,6 +164,7 @@ const websocketUpdateStateEpic = (action$: Observable<LivingRoomUpdatable>): Obs
 
 export default combineEpics(
   buttonClickEpic as any,
+  buttonReleaseEpic as any,
   dimDownEpic as any,
   lowEnergyEpic as any,
   profileDefaultEpic as any,
